@@ -1,0 +1,54 @@
+<html>
+<head>
+  <style>
+    body {
+      font-family: Helvetica, sans-serif;
+      padding:20px;
+    }
+    h1 {
+      text-align:center;
+    }
+    .sidebar {
+      width:300px;
+      float:left;
+      line-height:150%;
+    }
+    .info {
+      position:fixed;
+      top: 70px;
+      left:50px;
+      width:250px;
+    }
+    .main {
+      /* margin-left: 300px; */
+      border: 1px solid darkcyan;
+      overflow: hidden;
+      height: 80vh;
+      overflow: scroll;
+      position: relative;
+    }
+    .item {
+      width:20px;
+      height:20px;
+      margin:2px;
+      float:left;
+      text-align:center;
+      border: 1px solid #ccc;
+      padding:10px;
+      overflow: hidden;
+    }
+    .item.selected {
+      background: #ddd;
+    }
+    .item.selecting {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="./bundle.js"></script>
+</body>
+<script>
+</script>
+</html >

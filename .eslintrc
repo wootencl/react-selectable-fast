@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "babel",
+    "react"
+  ],
+  "parser": "babel-eslint",
+  "extends": "airbnb",
+  "rules": {
+    "semi": [1, "never"],
+    "no-param-reassign": 0,
+    "react/sort-comp": 0,
+  },
+}
+
