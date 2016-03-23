@@ -15,7 +15,6 @@ class SelectAllButton extends Component {
   }
 
   componentDidMount() {
-    this.context.selectable.registerWhitelist(this.refs.root)
     this.refs.root.addEventListener('mousedown', (e) => e.stopPropagation())
   }
 
@@ -23,6 +22,7 @@ class SelectAllButton extends Component {
     return (
       <this.props.component
         ref="root"
+        className={`selectable-select-all ${this.props.className}`}
         onClick={this.context.selectable.selectAll}
       >
         {this.props.children}

@@ -25,6 +25,7 @@ class Album extends React.Component {
 
     return (
       <div className={classes}>
+        <div className="tick">V</div>
         <h2>{title}</h2>
         <small>{year}</small>
         <Label {...this.props} />

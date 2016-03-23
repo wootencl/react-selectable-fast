@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
+import autobind from 'autobind-decorator'
 import isNodeInRoot from './nodeInRoot'
 import getBoundsForNode from './getBoundsForNode'
 import doObjectsCollide from './doObjectsCollide'
-import autobind from 'autobind-decorator'
 import Selectbox from './Selectbox'
 
 class SelectableGroup extends Component {
@@ -15,42 +15,47 @@ class SelectableGroup extends Component {
     scrollSpeed: PropTypes.number,
     minimumSpeedFactor: PropTypes.number,
     children: PropTypes.object,
-    /**
-     * Event that will fire when items are selected. Passes an array of keys.
-     */
-    onSelection: React.PropTypes.func,
+    allowClickWithoutSelected: PropTypes.bool,
+    clickClassName: PropTypes.string,
+    onSelectionClear: PropTypes.func,
+    onSelectionStart: PropTypes.func,
 
     /**
      * Event that will fire rapidly during selection (while the selector is
      * being dragged). Passes an array of keys.
      */
-    duringSelection: React.PropTypes.func,
+    duringSelection: PropTypes.func,
+
+    /**
+     * Event that will fire when items are selected. Passes an array of keys.
+     */
+    onSelectionFinish: PropTypes.func,
 
     /**
      * The component that will represent the Selectable DOM node
      */
-    component: React.PropTypes.node,
+    component: PropTypes.node,
 
     /**
      * Amount of forgiveness an item will offer to the selectbox before registering
      * a selection, i.e. if only 1px of the item is in the selection, it shouldn't be
      * included.
      */
-    tolerance: React.PropTypes.number,
+    tolerance: PropTypes.number,
 
     /**
      * In some cases, it the bounding box may need fixed positioning, if your layout
      * is relying on fixed positioned elements, for instance.
      * @type boolean
      */
-    fixedPosition: React.PropTypes.bool,
+    fixedPosition: PropTypes.bool,
 
     /**
      * When enabled, makes all new selections add to the already selected items,
      * except for selections that contain only previously selected items--in this case
      * it unselects those items.
      */
-    dontClearSelection: React.PropTypes.bool,
+    dontClearSelection: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -62,8 +67,16 @@ class SelectableGroup extends Component {
     scale: 1,
     scrollSpeed: 0.25,
     minimumSpeedFactor: 60,
-    onSelection: () => {},
+    onSelectionStart: () => {},
+    duringSelection: () => {},
+    onSelectionFinish: () => {},
+    onSelectionClear: () => {},
     dontClearSelection: true,
+    allowClickWithoutSelected: true,
+  }
+
+  static childContextTypes = {
+    selectable: React.PropTypes.object,
   }
 
   constructor(props) {
@@ -72,11 +85,12 @@ class SelectableGroup extends Component {
     this.mouseDownStarted = false
     this.mouseMoveStarted = false
     this.mouseUpStarted = false
-
     this.mouseDownData = null
+
     this.registry = new Set()
     this.selectedItems = new Set()
-    this.whiteList = this.props.whiteList
+    this.selectingItems = new Set()
+    this.whiteList = [this.props.whiteList, ...['.selectable-select-all', '.selectable-deselect-all']]
   }
 
   getChildContext() {
@@ -84,36 +98,24 @@ class SelectableGroup extends Component {
       selectable: {
         register: this.registerSelectable,
         unregister: this.unregisterSelectable,
-        clearSelection: this.clearSelection,
         selectAll: this.selectAll,
-        registerWhitelist: this.registerWhitelist,
-        getScrolledContainer: this.getScrolledContainer,
+        clearSelection: this.clearSelection,
+        getScrolledContainer: () => this.scrolledContainer,
       },
     }
-  }
-
-  @autobind
-  getScrolledContainer() {
-    return this.scrolledContainer
-  }
-
-  @autobind
-  registerWhitelist(node) {
-    this.whiteList.push(node)
-    console.log(this.whiteList)
   }
 
   componentDidMount() {
     this.rootNode = this.refs.selectableGroup
     this.scrolledContainer = this.props.scrolledContainer || this.rootNode
-    this.refs.selectableGroup.addEventListener('mousedown', this.mouseDown)
-    this.refs.selectableGroup.addEventListener('touchstart', this.mouseDown)
+    this.rootNode.addEventListener('mousedown', this.mouseDown)
+    this.rootNode.addEventListener('touchstart', this.mouseDown)
     window.addEventListener('resize', this.updateRegistry)
   }
 
   componentWillUnmount() {
-    this.refs.selectableGroup.removeEventListener('mousedown', this.mouseDown)
-    this.refs.selectableGroup.removeEventListener('touchstart', this.mouseDown)
+    this.rootNode.removeEventListener('mousedown', this.mouseDown)
+    this.rootNode.removeEventListener('touchstart', this.mouseDown)
     window.removeEventListener('resize', this.updateRegistry)
   }
 
@@ -184,14 +186,16 @@ class SelectableGroup extends Component {
     this.registry.delete(key)
   }
 
-  /**
-   * Called while moving the mouse with the button down. Changes the boundaries
-   * of the selection box
-   */
   @autobind
   openSelectbox(event) {
     const e = this.desktopEventCoords(event)
     this.setScollTop(e)
+
+    if (!this.selectionStarted) {
+      this.selectionStarted = true
+      this.props.onSelectionStart([...this.selectedItems])
+    }
+
     if (this.mouseMoveStarted) return
     this.mouseMoveStarted = true
 
@@ -208,7 +212,7 @@ class SelectableGroup extends Component {
     const leftContainerRelative = this.mouseDownData.boxLeft - this.rootBounds.left
     const boxLeft = Math.min(leftContainerRelative - w / this.props.scale, leftContainerRelative / this.props.scale)
 
-    const selectingItems = this.updatedSelecting() // Update list of currently selected items
+    this.updatedSelecting()
 
     this.refs.selectbox.setState({
       isBoxSelecting: true,
@@ -216,27 +220,30 @@ class SelectableGroup extends Component {
       boxHeight: Math.abs(h),
       boxLeft,
       boxTop,
-      selectedItems: selectingItems,
     }, () => {
       this.mouseMoveStarted = false
     })
 
-    this.props.duringSelection(Array.from(this.selectedItems))
+    this.props.duringSelection([...this.selectingItems])
   }
 
-  /**
-   * Returns array of all of the elements that are currently under the selector box.
-   */
   @autobind
   updatedSelecting() {
     const selectbox = this.refs.selectbox.getRef()
-    const { tolerance, dontClearSelection } = this.props
     if (!selectbox) return []
-    const currentItems = []
 
     const selectboxBounds = getBoundsForNode(selectbox)
-    selectboxBounds.top = selectboxBounds.top + this.rootNode.scrollTop
-    selectboxBounds.left = selectboxBounds.left + this.rootNode.scrollLeft
+    selectboxBounds.top = selectboxBounds.top
+    selectboxBounds.left = selectboxBounds.left
+
+    this.selectItems(selectboxBounds)
+  }
+
+  @autobind
+  selectItems(selectboxBounds) {
+    const { tolerance, dontClearSelection } = this.props
+    selectboxBounds.top += this.scrolledContainer.scrollTop
+    selectboxBounds.left += this.scrolledContainer.scrollLeft
 
     for (const item of this.registry.values()) {
       const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance)
@@ -244,90 +251,50 @@ class SelectableGroup extends Component {
       if (isCollided && !item.state.selecting) {
         item.setState({ selecting: true })
         this.selectedItems.add(item)
+        this.selectingItems.add(item)
       }
 
-      if (!dontClearSelection && !isCollided && item.state.selecting) {
-        item.setState({ selecting: false })
-        this.selectedItems.delete(item)
+      if (!isCollided && item.state.selecting) {
+        if (this.selectingItems.has(item)) {
+          item.setState({ selecting: false })
+          this.selectingItems.delete(item)
+        } else {
+          if (!dontClearSelection) {
+            item.setState({ selecting: false })
+            this.selectedItems.delete(item)
+          }
+        }
       }
     }
-
-    return currentItems
   }
 
   @autobind
   clearSelection() {
-    for (const item of this.registry.values()) {
-      if (item.state.selecting) {
-        item.setState({ selecting: false })
-      }
+    for (const item of this.selectedItems.values()) {
+      item.setState({ selecting: false })
+      this.selectedItems.delete(item)
     }
+    this.selectionStarted = false
+    this.props.onSelectionFinish([...this.selectedItems])
+    this.props.onSelectionClear()
   }
 
   @autobind
   selectAll() {
     for (const item of this.registry.values()) {
       item.setState({ selecting: true })
+      this.selectedItems.add(item)
     }
+    this.props.onSelectionFinish([...this.selectedItems])
   }
-
-  /**
-   * Called when a user clicks on an item (and doesn't drag). Selects the clicked item.
-   * Called by the selectElements() function.
-   */
-  // @autobind
-  // _click (e) {
-  //   const node = this.refs.selectableGroup
-  //
-  //   const {tolerance, dontClearSelection} = this.props,
-  //         selectbox = ReactDOM.findDOMNode(this.refs.selectbox)
-  //
-  //   var newItems = []  // For holding the clicked item
-  //
-  //   if(!dontClearSelection){ // Clear exisiting selections
-  //     this._clearSelections()
-  //   }else{
-  //     newItems = this.state.currentItems
-  //   }
-  //
-  //   for (const itemData of this.registry.values()) {
-  //     if(itemData.domNode && doObjectsCollide(selectbox, itemData.bounds, tolerance)) {
-  //       if(!dontClearSelection){
-  //         newItems.push(itemData.key)  // Only clicked item will be selected now
-  //       }else{ // Toggle item selection
-  //         if(newItems.indexOf(itemData.key) == -1){ // Not selected currently, mark item as selected
-  //           newItems.push(itemData.key)
-  //         }else{ // Selected currently, mark item as unselected
-  //           var index = newItems.indexOf(itemData.key)
-  //           newItems.splice(index, 1)
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //   // Clear array for duringSelection, since the "selecting" is now finished
-  //   this._clearSelectings()
-  //   this.props.duringSelection(this.state.selectingItems)  // Last time duringSelection() will be called since drag is complete.
-  //
-  //   // Close selector and update currently selected items
-  //   this.setSelectboxProps({
-  //       isBoxSelecting: false,
-  //       boxWidth: 0,
-  //       boxHeight: 0,
-  //       currentItems: newItems
-  //     })
-  //
-  //     this.props.onSelection(this.state.currentItems)
-  // }
 
   inWhiteList(target) {
-    return this.whiteList.some(node => target === node)
+    const nodes = [...document.querySelectorAll(this.whiteList.join(', '))]
+    return nodes.some(node => (
+      target === node || node.contains(target)
+    ))
   }
 
-  /**
-   * Called when a user presses the mouse button. Determines if a select box should
-   * be added, and if so, attach event listeners
-   */
   @autobind
   mouseDown(e) {
     if (this.mouseDownStarted) return
@@ -339,7 +306,6 @@ class SelectableGroup extends Component {
     if (e.which === 3 || e.button === 2) return
 
     if (this.inWhiteList(e.target)) {
-      console.log('in white list')
       this.mouseDownStarted = false
       return
     }
@@ -376,21 +342,17 @@ class SelectableGroup extends Component {
       scrollTop: this.scrolledContainer.scrollTop,
       scrollLeft: this.scrolledContainer.scrollLeft,
     }
+
     e.preventDefault()
 
-    this.selectionTimer = setTimeout(() => {
-      document.addEventListener('mousemove', this.openSelectbox)
-    }, 50)
+    document.addEventListener('mousemove', this.openSelectbox)
     document.addEventListener('mouseup', this.mouseUp)
   }
 
-
-  /**
-   * Called when the user has completed selection
-   */
   @autobind
-  mouseUp() {
+  mouseUp(e) {
     if (this.mouseUpStarted) return
+
     this.mouseUpStarted = true
     this.mouseDownStarted = false
 
@@ -405,81 +367,26 @@ class SelectableGroup extends Component {
 
     if (!this.mouseDownData) return
 
-    this.refs.selectbox.setState({
-      isBoxSelecting: false,
-      boxWidth: 0,
-      boxHeight: 0,
-      currentItems: [],
-    })
+    const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
+    const { boxTop, boxLeft } = this.mouseDownData
+    const isClick = (scaledLeft === boxLeft && scaledTop === boxTop)
 
-    this.props.onSelection(Array.from(this.selectedItems))
-  }
+    if (isClick && isNodeInRoot(e.target, this.rootNode)) {
+      if (this.props.allowClickWithoutSelected || this.selectedItems.size || e.target.className === this.props.clickClassName) {
+        this.selectItems({ top: scaledTop, left: scaledLeft, offsetWidth: 0, offsetHeight: 0 })
+        this.props.onSelectionFinish([...this.selectedItems])
+      }
+    } else {
+      this.props.duringSelection([this.selectingItems])
+      this.refs.selectbox.setState({
+        isBoxSelecting: false,
+        boxWidth: 0,
+        boxHeight: 0,
+      })
+      this.props.onSelectionFinish([...this.selectedItems])
+    }
 
-
-  /**
-   * Selects multiple children given x/y coords of the mouse
-   */
-  // @autobind
-  selectElements(e) {
-    // // Clear array for duringSelection, since the "selecting" is now finished
-    // this._clearSelectings()
-    // // Last time duringSelection() will be called since drag is complete.
-    // // this.props.duringSelection(this.state.selectingItems)
-    //
-    // const { tolerance, dontClearSelection } = this.props
-    // const selectbox = this.refs.selectbox.getRef()
-    //
-    // if (!dontClearSelection) { // Clear old selection if feature is not enabled
-    //   this._clearSelections()
-    // }
-    //
-    // if (!selectbox) {
-    //   // Since the selectbox is null, no drag event occured.
-    //   // Thus, we will process this as a click event...
-    //   this.refs.selectbox.setState({
-    //     isBoxSelecting: true,
-    //     boxWidth: 0,
-    //     boxHeight: 0,
-    //     boxLeft: this.mouseDownData.boxLeft,
-    //     boxTop: this.mouseDownData.boxTop,
-    //   }, () => {
-    //     // this._click()
-    //   })
-    //   return
-    // }
-    //
-    // // Mouse is now up...
-    // this.mouseDownData = null
-    //
-    // var newItems = []
-    // var allNewItemsAlreadySelected = true // Book keeping for dontClearSelection feature
-    //
-    // for (const itemData of this.registry.values()) {
-    //   if (itemData.domNode && doObjectsCollide(selectbox, itemData.bounds, tolerance)) {
-    //     itemData.toggleSelect()
-    //     // newItems.push(itemData.key)
-    //     if (this.state.currentItems.indexOf(itemData.key) == -1 && dontClearSelection) {
-    //       allNewItemsAlreadySelected = false
-    //     }
-    //   }
-    // }
-    //
-    // var newCurrentItems = []
-    // if (!dontClearSelection || !allNewItemsAlreadySelected) { // dontClearSelection is not enabled or
-    //                             // newItems should be added to the selection
-    //   newCurrentItems = this.state.currentItems.concat(newItems)
-    // } else {
-    //   newCurrentItems = this.state.currentItems.filter(function (i) {return newItems.indexOf(i) < 0}) // Delete newItems from currentItems
-    // }
-
-    this.refs.selectbox.setState({
-      isBoxSelecting: false,
-      boxWidth: 0,
-      boxHeight: 0,
-      currentItems: [],
-    })
-
-    // this.props.onSelection(newCurrentItems)
+    this.selectingItems.clear()
   }
 
   /**
@@ -496,8 +403,6 @@ class SelectableGroup extends Component {
   }
 
   render() {
-    console.log('selectable group render')
-
     return (
       <this.props.component {...this.props} ref="selectableGroup">
         <Selectbox ref="selectbox" />
@@ -505,10 +410,6 @@ class SelectableGroup extends Component {
       </this.props.component>
     )
   }
-}
-
-SelectableGroup.childContextTypes = {
-  selectable: React.PropTypes.object,
 }
 
 export default SelectableGroup

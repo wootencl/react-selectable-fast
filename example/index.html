@@ -7,6 +7,7 @@
     }
     h1 {
       text-align:center;
+      color: darkorchid;
     }
     .sidebar {
       width:300px;
@@ -20,7 +21,7 @@
       width:250px;
     }
     .main {
-      /* margin-left: 300px; */
+      padding: 0 10px;
       border: 1px solid darkcyan;
       overflow: hidden;
       height: 80vh;
@@ -28,26 +29,65 @@
       position: relative;
     }
     .item {
-      width:20px;
-      height:20px;
-      margin:2px;
-      float:left;
-      text-align:center;
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 2px;
+      float: left;
+      text-align: center;
       border: 1px solid #ccc;
-      padding:10px;
+      padding: 10px;
       overflow: hidden;
+    }
+    .item .tick {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 10px;
+    }
+    .item h2 {
+      font-size: 14px;
+      margin-top: 0;
     }
     .item.selected {
       background: #ddd;
     }
     .item.selecting {
       border: 1px solid #000;
+      background: rebeccapurple;
+      color: white;
+    }
+    .not-selectable {
+      display: inline-block;
+      margin: 1em 5px;
+      color: #4285f4;
+    }
+    .counter {
+      color: #009688;
+    }
+    .selectable-button {
+      display:  inline-block;
+      margin: 3px;
+    }
+    button {
+      display: inline-block;
+      position: relative;
+      width: 121px;
+      height: 32px;
+      line-height: 32px;
+      border-radius: 2px;
+      font-size: 0.9em;
+      background-color: #4285f4;
+      color: #fff;
+      border: none;
+      outline: none;
+      padding: 0;
     }
   </style>
 </head>
 <body>
-	<div id="app"></div>
-	<script src="./bundle.js"></script>
+  <div id="app"></div>
+  <script src="./bundle.js"></script>
 </body>
 <script>
 </script>

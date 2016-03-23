@@ -1,23 +1,9 @@
 import React from 'react'
-import { SelectableGroup, createSelectable } from 'react-selectable-extended'
-import Album from './Album'
+import autobind from 'autobind-decorator'
+import { SelectableGroup } from 'react-selectable-extended'
 import List from './List'
 
-const isNodeInRoot = (node, root) => {
-  while (node) {
-    if (node === root) {
-      return true
-    }
-    node = node.parentNode
-  }
-
-  return false
-}
-
-const SelectableAlbum = createSelectable(Album)
-
 class App extends React.Component {
-
   constructor(props) {
     super(props)
 
@@ -27,76 +13,59 @@ class App extends React.Component {
       tolerance: 0,
       distance: 0,
     }
-
-    this.handleSelection = this.handleSelection.bind(this)
-    this.handleSelecting = this.handleSelecting.bind(this)
-    this.handleToleranceChange = this.handleToleranceChange.bind(this)
   }
 
-  handleSelecting(keys) {
+  @autobind
+  handleSelecting(items) {
     this.setState({
-      selectingItems: keys,
-    })
-    // this.setState({
-    //   selectingItems: keys,
-    //   selectedItems: this.state.selectedItems,
-    // })
-  }
-
-  handleSelection(keys) {
-    this.setState({
-      selectedItems: keys,
-      selectingItems: this.state.selectingItems,
+      selectingItems: items,
     })
   }
 
-  handleToleranceChange(e) {
+  @autobind
+  handleSelectionFinish(items) {
     this.setState({
-      tolerance: parseInt(e.target.value, 10),
+      selectingItems: [],
+      selectedItems: items,
     })
+    console.log('Selection finished')
+  }
+
+  @autobind
+  handleSelectionStart() {
+    console.log('Selection started')
+  }
+
+  @autobind
+  handleSelectionClear() {
+    console.log('Selection cancel')
   }
 
   render() {
     return (
       <div>
-        <h1 style={{ height: '300px' }}>React Selectable Extended Demo</h1>
-        <p>Selecting: {this.state.selectingItems.length}</p>
+        <h1>React Selectable Fast Demo</h1>
+        <p>Selecting: <span className="counter">{this.state.selectingItems.length}</span></p>
+        <p>Selected: <span className="counter">{this.state.selectedItems.length}</span></p>
         <SelectableGroup
           className="main"
-          // onSelection={this.handleSelection}
+          clickClassName="click"
+          onSelectionStart={this.handleSelectionStart}
           duringSelection={this.handleSelecting}
+          onSelectionFinish={this.handleSelectionFinish}
+          onSelectionClear={this.handleSelectionClear}
           tolerance={this.state.tolerance}
           globalMouse={this.state.isGlobal}
           distance={this.state.distance}
-          dontClearSelection={Boolean(true)}
+          whiteList={['.not-selectable']}
+          allowClickWithoutSelected={false}
+          dontClearSelection
         >
           <List items={this.props.items} />
         </SelectableGroup>
       </div>
-
-    );
+    )
   }
 }
 
 export default App
-
-        // <div className="sidebar">
-        //  <div className="info">
-        //    <strong>Tolerance</strong>: <span>{this.state.tolerance}</span><br/>
-        //    <em>The number of pixels that must be in the bounding box in order for an item to be selected.</em>
-        //    <p><input type="range" min="0" max="50" step="1" onChange={this.handleToleranceChange} value={this.state.tolerance} /></p>
-        //
-        //    {this.state.selectedItems.length > 0 &&
-        //      <h3>You have selected the following items:</h3>
-        //    }
-        //    {this.state.selectedItems.length === 0 &&
-        //      <p>Please select some items from the right by clicking and dragging a box around them.</p>
-        //    }
-        //    <ul>
-        //    {this.state.selectedItems.map(function (key,i) {
-        //      return <li key={i}>{this.props.items[key].title}</li>
-        //    }.bind(this))}
-        //    </ul>
-        //  </div>
-        // </div>
-        //

@@ -1,14 +1,19 @@
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import autobind from 'autobind-decorator'
+import inViewport from './inViewport'
 import getBoundsForNode from './getBoundsForNode'
-import inViewport from 'in-viewport'
 
 const createSelectable = (WrappedComponent) => {
   class SelectableItem extends Component {
     static propTypes = {
       children: PropTypes.array,
       selectableKey: PropTypes.any,
+    }
+
+    static defaultProps = {
+      checkViewport: true,
+      viewportOffset: 6000,
     }
 
     static contextTypes = {
@@ -21,7 +26,6 @@ const createSelectable = (WrappedComponent) => {
         selected: false,
         selecting: false,
       }
-      this.scrolledContainer = this.context.selectable.getScrolledContainer()
     }
 
     componentDidMount() {
@@ -30,16 +34,18 @@ const createSelectable = (WrappedComponent) => {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-      if (nextState.selecting !== this.state.selecting && this.isInViewport()) {
-        return true
+      if (this.props !== nextProps || this.state !== nextState) {
+        if (this.props.checkViewport && this.isInViewport(this.props.viewportOffset)) {
+          return true
+        }
+
+        if (!this.scrolledContainer) {
+          this.scrolledContainer = this.context.selectable.getScrolledContainer()
+        }
+        this.setWatcher()
       }
 
-      this.setWatcher()
       return false
-    }
-
-    componentWillUpdate() {
-      // console.log(this.isInViewport())
     }
 
     componentWillUnmount() {
@@ -50,15 +56,14 @@ const createSelectable = (WrappedComponent) => {
     setWatcher() {
       this.watcher = inViewport(
         this.node,
-        { container: this.scrolledContainer, offset: 3000 },
+        { container: this.scrolledContainer, offset: this.props.viewportOffset},
         () => setTimeout(this.handleViewPortEnter, 50)
       )
     }
 
     @autobind
     handleViewPortEnter() {
-      // console.log('watcher triggered')
-      if (this.isInViewport(3000)) {
+      if (this.isInViewport(this.props.viewportOffset)) {
         this.forceUpdate()
       } else {
         this.setWatcher()
@@ -77,13 +82,10 @@ const createSelectable = (WrappedComponent) => {
     }
 
     render() {
-      // if (this.state.selected) console.log(this.state)
       const props = Object.assign({}, this.props, {
         selected: this.state.selected,
         selecting: this.state.selecting,
       })
-
-      // console.log('rendered')
 
       return React.createElement(
         WrappedComponent,

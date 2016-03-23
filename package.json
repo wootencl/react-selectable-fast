@@ -44,9 +44,5 @@
     "eslint-plugin-babel": "^3.1.0",
     "eslint-plugin-react": "^4.1.0",
     "webpack": "^1.12.11"
-  },
-  "dependencies": {
-    "in-viewport": "git+https://github.com/vvo/in-viewport.git",
-    "scrollmonitor": "git+https://github.com/stutrek/scrollMonitor.git"
   }
 }

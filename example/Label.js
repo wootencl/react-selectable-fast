@@ -4,9 +4,9 @@ class Label extends Component {
   render() {
     return (
       <div>
-        First: {'' + this.props.selected}
+        {'' + this.props.selecting}
         <br />
-        Second: {'' + this.props.selecting}
+        {'' + this.props.selected}
       </div>
     )
   }

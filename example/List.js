@@ -12,13 +12,15 @@ class List extends React.Component {
   render() {
     return (
       <div>
-        <p>omg</p>
-        <SelectAllButton>
-          <button>Select all</button>
-        </SelectAllButton>
-        <DeselectAllButton>
-          <button>Clear selection</button>
-        </DeselectAllButton>
+        <p className="not-selectable">Not selectable text</p>
+        <div>
+          <SelectAllButton className="selectable-button">
+            <button>Select all</button>
+          </SelectAllButton>
+          <DeselectAllButton className="selectable-button">
+            <button>Clear selection</button>
+          </DeselectAllButton>
+        </div>
         {this.props.items.map((item, i) => (
           <SelectableAlbum
             key={i}
