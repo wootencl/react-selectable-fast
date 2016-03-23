@@ -7,7 +7,7 @@ import Selectbox from './Selectbox'
 
 class SelectableGroup extends Component {
   static propTypes = {
-    scrolledContainer: PropTypes.node,
+    scrollContainer: PropTypes.node,
     scale: PropTypes.number,
     distance: PropTypes.number,
     globalMouse: PropTypes.bool,
@@ -17,6 +17,7 @@ class SelectableGroup extends Component {
     children: PropTypes.object,
     allowClickWithoutSelected: PropTypes.bool,
     clickClassName: PropTypes.string,
+    onSelectionClick: PropTypes.func,
     onSelectionClear: PropTypes.func,
     onSelectionStart: PropTypes.func,
 
@@ -100,14 +101,14 @@ class SelectableGroup extends Component {
         unregister: this.unregisterSelectable,
         selectAll: this.selectAll,
         clearSelection: this.clearSelection,
-        getScrolledContainer: () => this.scrolledContainer,
+        getScrolledContainer: () => this.scrollContainer,
       },
     }
   }
 
   componentDidMount() {
     this.rootNode = this.refs.selectableGroup
-    this.scrolledContainer = this.props.scrolledContainer || this.rootNode
+    this.scrollContainer = this.props.scrollContainer || this.rootNode
     this.rootNode.addEventListener('mousedown', this.mouseDown)
     this.rootNode.addEventListener('touchstart', this.mouseDown)
     window.addEventListener('resize', this.updateRegistry)
@@ -129,7 +130,7 @@ class SelectableGroup extends Component {
 
   @autobind
   setScollTop(e) {
-    const scrollTop = this.scrolledContainer.scrollTop
+    const scrollTop = this.scrollContainer.scrollTop
     this.checkScrollUp(e, scrollTop)
     this.checkScrollDown(e, scrollTop)
   }
@@ -141,7 +142,7 @@ class SelectableGroup extends Component {
 
     if (offset > 0 || e.clientY < 0) {
       const newTop = currentTop - (Math.max(offset, minimumSpeedFactor)) * scrollSpeed
-      this.scrolledContainer.scrollTop = newTop
+      this.scrollContainer.scrollTop = newTop
     }
   }
 
@@ -152,7 +153,7 @@ class SelectableGroup extends Component {
 
     if (offset > 0 || e.clientY > window.innerHeight) {
       const newTop = currentTop + (Math.max(offset, minimumSpeedFactor)) * scrollSpeed
-      this.scrolledContainer.scrollTop = Math.min(newTop, this.maxScroll)
+      this.scrollContainer.scrollTop = Math.min(newTop, this.maxScroll)
     }
   }
 
@@ -167,8 +168,8 @@ class SelectableGroup extends Component {
   @autobind
   updateRegistry() {
     const containerScroll = {
-      scrollTop: this.rootNode.scrollTop,
-      scrollLeft: this.rootNode.scrollLeft,
+      scrollTop: this.scrollContainer.scrollTop,
+      scrollLeft: this.scrollContainer.scrollLeft,
     }
 
     for (const selectableItem of this.registry.values()) {
@@ -199,7 +200,7 @@ class SelectableGroup extends Component {
     if (this.mouseMoveStarted) return
     this.mouseMoveStarted = true
 
-    const scrollTop = this.scrolledContainer.scrollTop
+    const scrollTop = this.scrollContainer.scrollTop
     const applyContainerScroll = (top, scroll) => top + scroll / this.props.scale
 
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
@@ -240,18 +241,19 @@ class SelectableGroup extends Component {
   }
 
   @autobind
-  selectItems(selectboxBounds) {
+  selectItems(selectboxBounds, { click } = {}) {
     const { tolerance, dontClearSelection } = this.props
-    selectboxBounds.top += this.scrolledContainer.scrollTop
-    selectboxBounds.left += this.scrolledContainer.scrollLeft
+    selectboxBounds.top += this.scrollContainer.scrollTop
+    selectboxBounds.left += this.scrollContainer.scrollLeft
 
     for (const item of this.registry.values()) {
       const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance)
 
-      if (isCollided && !item.state.selecting) {
-        item.setState({ selecting: true })
+      if (isCollided && (click || !item.state.selecting)) {
+        item.setState({ selecting: !item.state.selecting })
         this.selectedItems.add(item)
         this.selectingItems.add(item)
+        if (click) this.clickedItem = item
       }
 
       if (!isCollided && item.state.selecting) {
@@ -302,8 +304,7 @@ class SelectableGroup extends Component {
     this.mouseUpStarted = false
     e = this.desktopEventCoords(e)
 
-    // Right clicks
-    if (e.which === 3 || e.button === 2) return
+    if (e.which === 3 || e.button === 2) return // Right clicks
 
     if (this.inWhiteList(e.target)) {
       this.mouseDownStarted = false
@@ -339,8 +340,8 @@ class SelectableGroup extends Component {
     this.mouseDownData = {
       boxLeft: scaledLeft,
       boxTop: scaledTop,
-      scrollTop: this.scrolledContainer.scrollTop,
-      scrollLeft: this.scrolledContainer.scrollLeft,
+      scrollTop: this.scrollContainer.scrollTop,
+      scrollLeft: this.scrollContainer.scrollLeft,
     }
 
     e.preventDefault()
@@ -373,7 +374,8 @@ class SelectableGroup extends Component {
 
     if (isClick && isNodeInRoot(e.target, this.rootNode)) {
       if (this.props.allowClickWithoutSelected || this.selectedItems.size || e.target.className === this.props.clickClassName) {
-        this.selectItems({ top: scaledTop, left: scaledLeft, offsetWidth: 0, offsetHeight: 0 })
+        this.selectItems({ top: scaledTop, left: scaledLeft, offsetWidth: 0, offsetHeight: 0 }, { click: true })
+        this.props.onSelectionClick([...this.selectedItems], this.clickedItem)
         this.props.onSelectionFinish([...this.selectedItems])
       }
     } else {

@@ -16,29 +16,29 @@ class App extends React.Component {
   }
 
   @autobind
-  handleSelecting(items) {
-    this.setState({
-      selectingItems: items,
-    })
+  handleSelecting(selectingItems) {
+    this.setState({ selectingItems })
   }
 
   @autobind
-  handleSelectionFinish(items) {
+  handleSelectionFinish(selectedItems) {
     this.setState({
+      selectedItems,
       selectingItems: [],
-      selectedItems: items,
     })
-    console.log('Selection finished')
+    console.log(`Finished selection ${selectedItems.length}`)
   }
 
-  @autobind
   handleSelectionStart() {
-    console.log('Selection started')
+    console.log(`Started selection`)
   }
 
-  @autobind
   handleSelectionClear() {
-    console.log('Selection cancel')
+    console.log('Cancel selection')
+  }
+
+  handleSelectionClick(selectedItems, clickedItem) {
+    console.log(`Clicked: ${clickedItem} in ${selectedItems.length}`)
   }
 
   render() {
@@ -49,7 +49,8 @@ class App extends React.Component {
         <p>Selected: <span className="counter">{this.state.selectedItems.length}</span></p>
         <SelectableGroup
           className="main"
-          clickClassName="click"
+          clickClassName="tick"
+          onSelectionClick={this.handleSelectionClick}
           onSelectionStart={this.handleSelectionStart}
           duringSelection={this.handleSelecting}
           onSelectionFinish={this.handleSelectionFinish}
