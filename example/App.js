@@ -1,6 +1,6 @@
 import React from 'react'
 import autobind from 'autobind-decorator'
-import { SelectableGroup } from 'react-selectable-extended'
+import { SelectableGroup } from 'react-selectable-fast'
 import List from './List'
 
 class App extends React.Component {
