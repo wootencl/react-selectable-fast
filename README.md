@@ -1,9 +1,9 @@
-# Selectable items for React
+# Selectable scrollable items for React
 
 Allows individual or group selection of items using the mouse/touch.
 
 ## Demo
-[Try it out](http://valerybugakov.github.io/react-selectable-fast/example/)
+[Try it out](http://valerybugakov.github.io/react-selectable-fast)
 
 ## Based on react-selectable
 This project is based on [react-selectable](https://github.com/unclecheese/react-selectable) by [unclecheese](https://github.com/unclecheese). It extends the original functionality in the following ways:
@@ -19,47 +19,62 @@ npm install react-selectable-fast
 ```
 
 ```js
-import React from 'react';
-import { render } from 'react-dom';
-import { SelectableGroup, createSelectable } from 'react-selectable';
-import SomeComponent from './some-component';
+import React, { Component, PropTypes } from 'react'
+import { SelectableGroup } from 'react-selectable-fast'
 
-const SelectableComponent = createSelectable(SomeComponent);
+class App extends Component {
+  ...
 
-class App extends React.Component {
-
-  constructor (props) {
-  	super(props);
-  	this.state = {
-  		selectedKeys: [],
-      selectingKeys: []
-  	};
-  }
-
-  render () {
+  render() {
     return (
-      <SelectableGroup onSelection={this.handleSelection} duringSelection={this.handleSelecting}>
-        {this.props.items.map((item, i) => {
-          	let selected = this.state.selectedKeys.indexOf(item.id) > -1;
-            let selecting = this.state.selectingKeys.indexOf(item.id) > -1;
-          	return (
-          		<SelectableComponent key={i} selected={selected} selecting={selecting} selectableKey={item.id}>
-          			{item.title}
-          		</SelectableComponent>
-          	);
-        })}
+      <SelectableGroup
+        className="main"
+        clickClassName="tick"
+        onSelectionStart={this.handleSelectionStart}
+        duringSelection={this.handleSelecting}
+        onSelectionFinish={this.handleSelectionFinish}
+        onSelectionClear={this.handleSelectionClear}
+        globalMouse={this.state.isGlobal}
+        tolerance={this.state.tolerance}
+        distance={this.state.distance}
+        whiteList={['.not-selectable']}
+        allowClickWithoutSelected={false}
+        dontClearSelection
+      >
+        <List items={this.props.items} />
       </SelectableGroup>
-    );
-  },
-
-  handleSelection (selectedKeys) {
-  	this.setState({ selectedKeys });
+    )
   }
+}
+```
 
-  handleSelecting (selectingKeys) {
-    this.setState({ selectingKeys });
+```js
+import React, { Component, PropTypes } from 'react'
+import { createSelectable, SelectAll, DeselectAll } from 'react-selectable-fast'
+import SomeComponent from './SomeComponent'
+
+const SelectableComponent = createSelectable(SomeComponent)
+
+class List extends Component {
+  render() {
+    return (
+      <div>
+        <SelectAll className="selectable-button">
+          <button>Select all</button>
+        </SelectAll>
+        <DeselectAll className="selectable-button">
+          <button>Clear selection</button>
+        </DeselectAll>
+        {this.props.items.map((item, i) => (
+          <SelectableComponent
+            key={i}
+            title={item.title}
+            year={item.year}
+          />
+        ))}
+      </div>
+    )
   }
-
 }
 ```
 ## Configuration

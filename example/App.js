@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { Component, PropTypes } from 'react'
 import autobind from 'autobind-decorator'
 import { SelectableGroup } from '../src'
 import List from './List'
 
-class App extends React.Component {
+class App extends Component {
   constructor(props) {
     super(props)
 
@@ -26,15 +26,15 @@ class App extends React.Component {
       selectedItems,
       selectingItems: [],
     })
-    // console.log(`Finished selection ${selectedItems.length}`)
+    console.log(`Finished selection ${selectedItems.length}`)
   }
 
   handleSelectionStart() {
-    // console.log('Started selection')
+    console.log('Started selection')
   }
 
   handleSelectionClear() {
-    // console.log('Cancel selection')
+    console.log('Cancel selection')
   }
 
   render() {

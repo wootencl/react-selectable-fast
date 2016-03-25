@@ -1,11 +1,11 @@
 import SelectableGroup from './Selectable-group'
 import createSelectable from './CreateSelectable'
-import SelectAllButton from './SelectAll'
-import DeselectAllButton from './DeselectAll'
+import SelectAll from './SelectAll'
+import DeselectAll from './DeselectAll'
 
 export {
   SelectableGroup,
   createSelectable,
-  SelectAllButton,
-  DeselectAllButton,
+  SelectAll,
+  DeselectAll,
 }
