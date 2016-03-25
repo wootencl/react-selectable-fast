@@ -10,7 +10,7 @@
   "scripts": {
     "start": "webpack-dev-server --content-base build",
     "deploy": "NODE_ENV=production webpack -p --config webpack.production.config.js",
-    "examples": "webpack-dev-server --config webpack.config.example.js --content-base example",
+    "examples": "webpack-dev-server --config ./example/webpack.config.js --content-base example",
     "prepublish": "babel ./src/ -d ./lib/",
 
     "build": "node node_modules/webpack/bin/webpack",
@@ -26,6 +26,7 @@
     "selection",
     "mouse",
     "fast",
+    "scrollable",
     "performance",
     "drag",
     "touch",

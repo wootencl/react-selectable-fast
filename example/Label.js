@@ -1,15 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-class Label extends Component {
-  render() {
-    return (
-      <div>
-        {'' + this.props.selecting}
-        <br />
-        {'' + this.props.selected}
-      </div>
-    )
-  }
-}
+const Label = ({ selecting, selected }) => (
+  <div className="album-label">
+    Selecting: <span>{'' + selecting}</span>
+    <br />
+    Selected: <span>{'' + selected}</span>
+  </div>
+)
 
 export default Label

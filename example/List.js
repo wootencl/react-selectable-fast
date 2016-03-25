@@ -1,5 +1,5 @@
 import React from 'react'
-import { createSelectable, SelectAllButton, DeselectAllButton } from 'react-selectable-fast'
+import { createSelectable, SelectAllButton, DeselectAllButton } from '../src'
 import Album from './Album'
 
 const SelectableAlbum = createSelectable(Album)

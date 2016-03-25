@@ -1,6 +1,6 @@
 import React from 'react'
 import autobind from 'autobind-decorator'
-import { SelectableGroup } from 'react-selectable-fast'
+import { SelectableGroup } from '../src'
 import List from './List'
 
 class App extends React.Component {
@@ -26,19 +26,15 @@ class App extends React.Component {
       selectedItems,
       selectingItems: [],
     })
-    console.log(`Finished selection ${selectedItems.length}`)
+    // console.log(`Finished selection ${selectedItems.length}`)
   }
 
   handleSelectionStart() {
-    console.log(`Started selection`)
+    // console.log('Started selection')
   }
 
   handleSelectionClear() {
-    console.log('Cancel selection')
-  }
-
-  handleSelectionClick(selectedItems, clickedItem) {
-    console.log(`Clicked: ${clickedItem} in ${selectedItems.length}`)
+    // console.log('Cancel selection')
   }
 
   render() {
@@ -50,13 +46,12 @@ class App extends React.Component {
         <SelectableGroup
           className="main"
           clickClassName="tick"
-          onSelectionClick={this.handleSelectionClick}
           onSelectionStart={this.handleSelectionStart}
           duringSelection={this.handleSelecting}
           onSelectionFinish={this.handleSelectionFinish}
           onSelectionClear={this.handleSelectionClear}
-          tolerance={this.state.tolerance}
           globalMouse={this.state.isGlobal}
+          tolerance={this.state.tolerance}
           distance={this.state.distance}
           whiteList={['.not-selectable']}
           allowClickWithoutSelected={false}

@@ -29,10 +29,22 @@
       overflow: scroll;
       position: relative;
     }
+    .selectable-selectbox {
+      z-index: 9000;
+      position: absolute;
+      cursor: default;
+      background: none;
+      border: 1px dashed grey;
+    }
+    .album-label {
+      display: block;
+      margin: 5px 0;
+      font-size: smaller;
+    }
     .item {
       position: relative;
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       margin: 2px;
       float: left;
       text-align: center;
@@ -54,12 +66,11 @@
       margin-top: 0;
     }
     .item.selected {
-      background: #ddd;
-    }
-    .item.selecting {
-      border: 1px solid #000;
       background: rebeccapurple;
       color: white;
+    }
+    .item.selecting {
+      border: 1px solid rebeccapurple;
     }
     .not-selectable {
       display: inline-block;

@@ -3,9 +3,12 @@ import autobind from 'autobind-decorator'
 
 class Selectbox extends Component {
   static propTypes = {
-    registry: PropTypes.object,
-    tolerance: PropTypes.number,
     fixedPosition: PropTypes.bool,
+    className: PropTypes.string,
+  }
+
+  static defaultProps = {
+    className: 'selectable-selectbox'
   }
 
   constructor() {
@@ -13,13 +16,11 @@ class Selectbox extends Component {
 
     this.state = {
       isBoxSelecting: false,
+      left: 0,
+      top: 0,
       boxWidth: 0,
       boxHeight: 0,
-      currentItems: [],
-      selectingItems: [],
     }
-
-    this.setState = this.setState.bind(this)
   }
 
   @autobind
@@ -38,19 +39,11 @@ class Selectbox extends Component {
       cursor: 'default',
     }
 
-    const spanStyle = {
-      backgroundColor: 'transparent',
-      border: '1px dashed #999',
-      width: '100%',
-      height: '100%',
-      float: 'left',
-    }
-
     return (
       <div>
         {
           this.state.isBoxSelecting &&
-          <div style={boxStyle} ref="selectbox"><span style={spanStyle}></span></div>
+          <div style={boxStyle} className={this.props.className} ref="selectbox"></div>
         }
       </div>
     )
