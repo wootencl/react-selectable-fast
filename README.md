@@ -3,7 +3,7 @@
 Allows individual or group selection of items using the mouse/touch.
 
 ## Demo
-[Try it out](http://leopoldjoy.github.io/react-selectable-extended/example/)
+[Try it out](http://valerybugakov.github.io/react-selectable-fast/example/)
 
 ## Based on react-selectable
 This project is based on [react-selectable](https://github.com/unclecheese/react-selectable) by [unclecheese](https://github.com/unclecheese). It extends the original functionality in the following ways:
@@ -15,7 +15,7 @@ If you are looking for a lightweight, stateless selector and don't need any of t
 
 ## Getting started
 ```
-npm install react-selectable-extended
+npm install react-selectable-fast
 ```
 
 ```js
@@ -27,7 +27,7 @@ import SomeComponent from './some-component';
 const SelectableComponent = createSelectable(SomeComponent);
 
 class App extends React.Component {
-  
+
   constructor (props) {
   	super(props);
   	this.state = {
@@ -51,7 +51,7 @@ class App extends React.Component {
       </SelectableGroup>
     );
   },
-  
+
   handleSelection (selectedKeys) {
   	this.setState({ selectedKeys });
   }
@@ -59,7 +59,7 @@ class App extends React.Component {
   handleSelecting (selectingKeys) {
     this.setState({ selectingKeys });
   }
-	
+
 }
 ```
 ## Configuration

@@ -1,22 +1,18 @@
 {
   "name": "react-selectable-fast",
   "version": "0.1.0",
-  "description": "",
+  "description": "Enable other React components to be selectable by drawing a box with your mouse",
   "repository": {
     "type": "git",
     "url": "git://github.com/valerybugakov/react-selectable-fast.git"
   },
   "main": "lib/index.js",
   "scripts": {
-    "start": "webpack-dev-server --content-base build",
-    "deploy": "NODE_ENV=production webpack -p --config webpack.production.config.js",
-    "examples": "webpack-dev-server --config ./example/webpack.config.js --content-base example",
-    "prepublish": "babel ./src/ -d ./lib/",
-
-    "build": "node node_modules/webpack/bin/webpack",
-    "example": "node node_modules/webpack/bin/webpack --config webpack.config.example.js",
+    "example": "webpack-dev-server --config ./example/webpack.config.js --content-base example",
     "watch": "node node_modules/webpack/bin/webpack --watch",
-    "wex": "node node_modules/webpack/bin/webpack --watch --config webpack.config.example.js"
+    "build": "node node_modules/webpack/bin/webpack",
+    "dist": "NODE_ENV=production webpack -p --config webpack.production.config.js",
+    "prepublish": "babel ./src/ -d ./lib/"
   },
   "bugs": {
     "url": "https://github.com/valerybugakov/react-selectable-fast/issues"
@@ -36,6 +32,7 @@
   "license": "MIT",
   "devDependencies": {
     "autobind-decorator": "^1.3.3",
+    "babel-cli": "^6.6.5",
     "babel-core": "^6.4.5",
     "babel-eslint": "^5.0.0",
     "babel-loader": "^6.2.1",

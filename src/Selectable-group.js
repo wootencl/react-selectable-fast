@@ -114,13 +114,11 @@ class SelectableGroup extends Component {
     this.initialRootBounds = this.rootNode.getBoundingClientRect()
     this.rootNode.addEventListener('mousedown', this.mouseDown)
     this.rootNode.addEventListener('touchstart', this.mouseDown)
-    window.addEventListener('resize', this.updateRegistry)
   }
 
   componentWillUnmount() {
     this.rootNode.removeEventListener('mousedown', this.mouseDown)
     this.rootNode.removeEventListener('touchstart', this.mouseDown)
-    window.removeEventListener('resize', this.updateRegistry)
   }
 
   @autobind
