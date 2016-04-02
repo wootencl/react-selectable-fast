@@ -16,7 +16,7 @@ class SelectableGroup extends Component {
     minimumSpeedFactor: PropTypes.number,
     allowClickWithoutSelected: PropTypes.bool,
     clickableClassName: PropTypes.string,
-    selectionModelClass: PropTypes.string,
+    selectionModeClass: PropTypes.string,
     onSelectionClear: PropTypes.func,
     onSelectionStart: PropTypes.func,
 
@@ -78,7 +78,7 @@ class SelectableGroup extends Component {
     onSelectionClear: () => {},
     dontClearSelection: true,
     allowClickWithoutSelected: true,
-    selectionModelClass: 'in-selection-mode',
+    selectionModeClass: 'in-selection-mode',
   }
 
   static childContextTypes = {
@@ -459,7 +459,7 @@ class SelectableGroup extends Component {
     return (
       <this.props.component
         ref="selectableGroup"
-        className={`${this.props.className} ${this.state.selectionMode ? 'in-selection-mode' : ''}`}
+        className={`${this.props.className} ${this.state.selectionMode ? this.props.selectionModeClass : ''}`}
       >
         <Selectbox fixedPosition={this.props.fixedPosition} ref="selectbox" />
         {this.props.children}
