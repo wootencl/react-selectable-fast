@@ -12,7 +12,7 @@ class List extends Component {
   render() {
     return (
       <div>
-        <p className="not-selectable">Not selectable text</p>
+        <p className="not-selectable">Press ESC to clear selection</p>
         <div>
           <SelectAll className="selectable-button">
             <button>Select all</button>

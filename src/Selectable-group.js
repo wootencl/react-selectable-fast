@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import React, { Component, PropTypes } from 'react'
 import autobind from 'autobind-decorator'
 import isNodeInRoot from './nodeInRoot'
@@ -14,7 +15,8 @@ class SelectableGroup extends Component {
     scrollSpeed: PropTypes.number,
     minimumSpeedFactor: PropTypes.number,
     allowClickWithoutSelected: PropTypes.bool,
-    clickClassName: PropTypes.string,
+    clickableClassName: PropTypes.string,
+    selectionModelClass: PropTypes.string,
     onSelectionClear: PropTypes.func,
     onSelectionStart: PropTypes.func,
 
@@ -76,6 +78,7 @@ class SelectableGroup extends Component {
     onSelectionClear: () => {},
     dontClearSelection: true,
     allowClickWithoutSelected: true,
+    selectionModelClass: 'in-selection-mode',
   }
 
   static childContextTypes = {
@@ -84,6 +87,7 @@ class SelectableGroup extends Component {
 
   constructor(props) {
     super(props)
+    this.state = { selectionMode: false }
 
     this.mouseDownStarted = false
     this.mouseMoveStarted = false
@@ -114,11 +118,15 @@ class SelectableGroup extends Component {
     this.initialRootBounds = this.rootNode.getBoundingClientRect()
     this.rootNode.addEventListener('mousedown', this.mouseDown)
     this.rootNode.addEventListener('touchstart', this.mouseDown)
+    document.addEventListener('keydown', this.keyListener)
+    document.addEventListener('keyup', this.keyListener)
   }
 
   componentWillUnmount() {
     this.rootNode.removeEventListener('mousedown', this.mouseDown)
     this.rootNode.removeEventListener('touchstart', this.mouseDown)
+    document.removeEventListener('keydown', this.keyListener)
+    document.removeEventListener('keyup', this.keyListener)
   }
 
   @autobind
@@ -193,8 +201,8 @@ class SelectableGroup extends Component {
     const e = this.desktopEventCoords(event)
     this.setScollTop(e)
 
-    if (!this.selectionStarted) {
-      this.selectionStarted = true
+    if (!this.state.selectionMode) {
+      this.setState({ selectionMode: true })
       this.props.onSelectionStart([...this.selectedItems])
     }
 
@@ -203,10 +211,13 @@ class SelectableGroup extends Component {
 
     const scrollTop = this.scrollContainer.scrollTop
     const applyContainerScroll = (top, scroll) => top + scroll / this.props.scale
-
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
-    const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - window.scrollY)
-    let boxTop = applyContainerScroll(this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - window.scrollY)
+
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
+    const windowScroll = isChrome ? window.scrollY : document.documentElement.scrollTop
+
+    const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - windowScroll)
+    let boxTop = applyContainerScroll(this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - windowScroll)
     const h = boxTop - top
     boxTop = Math.min(boxTop - h, boxTop)
 
@@ -235,9 +246,6 @@ class SelectableGroup extends Component {
     if (!selectbox) return
 
     const selectboxBounds = getBoundsForNode(selectbox)
-    selectboxBounds.top = selectboxBounds.top
-    selectboxBounds.left = selectboxBounds.left
-
     this.selectItems(selectboxBounds)
   }
 
@@ -286,7 +294,7 @@ class SelectableGroup extends Component {
       item.setState({ selected: false })
       this.selectedItems.delete(item)
     }
-    this.selectionStarted = false
+    this.setState({ selectionMode: false })
     this.props.onSelectionFinish([...this.selectedItems])
     this.props.onSelectionClear()
   }
@@ -350,6 +358,7 @@ class SelectableGroup extends Component {
       boxTop: scaledTop,
       scrollTop: this.scrollContainer.scrollTop,
       scrollLeft: this.scrollContainer.scrollLeft,
+      target: e.target,
     }
 
     e.preventDefault()
@@ -359,12 +368,12 @@ class SelectableGroup extends Component {
   }
 
   preventEvent(target, type) {
-    const preventHandler = (evt) => {
+    const preventHandler = (e) => {
       target.removeEventListener(type, preventHandler, true)
-      evt.preventDefault()
-      return evt.stopPropagation()
+      e.preventDefault()
+      e.stopPropagation()
     }
-    return target.addEventListener(type, preventHandler, true)
+    target.addEventListener(type, preventHandler, true)
   }
 
   @autobind
@@ -388,9 +397,10 @@ class SelectableGroup extends Component {
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
     const { boxTop, boxLeft } = this.mouseDownData
     const isClick = (scaledLeft === boxLeft && scaledTop === boxTop)
+    const isMouseUpOnClickElement = [...(e.target.classList || [])].indexOf(this.props.clickClassName) > -1
 
     if (isClick && isNodeInRoot(e.target, this.rootNode)) {
-      if (this.props.allowClickWithoutSelected || this.selectedItems.size || e.target.className === this.props.clickClassName) {
+      if (this.props.allowClickWithoutSelected || this.selectedItems.size || isMouseUpOnClickElement || this.ctrlPressed) {
         this.selectItems({ top: scaledTop, left: scaledLeft, offsetWidth: 0, offsetHeight: 0 }, { click: true })
         this.props.onSelectionFinish([...this.selectedItems], this.clickedItem)
 
@@ -408,12 +418,28 @@ class SelectableGroup extends Component {
       this.selectedItems = new Set([...this.selectedItems, ...this.selectingItems])
       this.selectingItems.clear()
 
+      if (e.which === 1 && (this.mouseDownData.target === e.target || isMouseUpOnClickElement)) {
+        this.preventEvent(e.target, 'click')
+      }
+
       this.refs.selectbox.setState({
         isBoxSelecting: false,
         boxWidth: 0,
         boxHeight: 0,
       })
       this.props.onSelectionFinish([...this.selectedItems])
+    }
+  }
+
+  @autobind
+  keyListener(e) {
+    this.ctrlPressed = e.ctrlKey || e.metaKey
+    if (this.ctrlPressed) {
+      return
+    }
+
+    if (e.keyCode === 27) {
+      this.clearSelection()
     }
   }
 
@@ -431,7 +457,10 @@ class SelectableGroup extends Component {
 
   render() {
     return (
-      <this.props.component {...this.props} ref="selectableGroup">
+      <this.props.component
+        ref="selectableGroup"
+        className={`${this.props.className} ${this.state.selectionMode ? 'in-selection-mode' : ''}`}
+      >
         <Selectbox fixedPosition={this.props.fixedPosition} ref="selectbox" />
         {this.props.children}
       </this.props.component>
