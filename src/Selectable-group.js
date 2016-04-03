@@ -18,7 +18,6 @@ class SelectableGroup extends Component {
     clickableClassName: PropTypes.string,
     selectionModeClass: PropTypes.string,
     onSelectionClear: PropTypes.func,
-    onSelectionStart: PropTypes.func,
 
     /**
      * Scroll container selector
@@ -72,7 +71,6 @@ class SelectableGroup extends Component {
     scale: 1,
     scrollSpeed: 0.25,
     minimumSpeedFactor: 60,
-    onSelectionStart: () => {},
     duringSelection: () => {},
     onSelectionFinish: () => {},
     onSelectionClear: () => {},
@@ -196,15 +194,19 @@ class SelectableGroup extends Component {
     this.registry.delete(selectableItem)
   }
 
+  toggleSelectionMode() {
+    if (this.selectedItems.size && !this.state.selectionMode) {
+      this.setState({ selectionMode: true })
+    }
+    if (!this.selectedItems.size && this.state.selectionMode) {
+      this.setState({ selectionMode: false })
+    }
+  }
+
   @autobind
   openSelectbox(event) {
     const e = this.desktopEventCoords(event)
     this.setScollTop(e)
-
-    if (!this.state.selectionMode) {
-      this.setState({ selectionMode: true })
-      this.props.onSelectionStart([...this.selectedItems])
-    }
 
     if (this.mouseMoveStarted) return
     this.mouseMoveStarted = true
@@ -386,31 +388,14 @@ class SelectableGroup extends Component {
     document.removeEventListener('mousemove', this.openSelectbox)
     document.removeEventListener('mouseup', this.mouseUp)
 
-    const node = this.refs.selectableGroup
-    node.removeEventListener('mousemove', this.openSelectbox)
-    node.removeEventListener('mouseup', this.mouseUp)
-    node.removeEventListener('touchmove', this.openSelectbox)
-    node.removeEventListener('touchend', this.mouseUp)
-
     if (!this.mouseDownData) return
 
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
     const { boxTop, boxLeft } = this.mouseDownData
     const isClick = (scaledLeft === boxLeft && scaledTop === boxTop)
-    const isMouseUpOnClickElement = [...(e.target.classList || [])].indexOf(this.props.clickClassName) > -1
 
     if (isClick && isNodeInRoot(e.target, this.rootNode)) {
-      if (this.props.allowClickWithoutSelected || this.selectedItems.size || isMouseUpOnClickElement || this.ctrlPressed) {
-        this.selectItems({ top: scaledTop, left: scaledLeft, offsetWidth: 0, offsetHeight: 0 }, { click: true })
-        this.props.onSelectionFinish([...this.selectedItems], this.clickedItem)
-
-        if (e.which === 1) {
-          this.preventEvent(e.target, 'click')
-        }
-        if (e.which === 2 || e.which === 3) {
-          this.preventEvent(e.target, 'contextmenu')
-        }
-      }
+      this.handleClick(e, scaledTop, scaledLeft)
     } else {
       for (const item of this.selectingItems.values()) {
         item.setState({ selected: true, selecting: false })
@@ -418,7 +403,7 @@ class SelectableGroup extends Component {
       this.selectedItems = new Set([...this.selectedItems, ...this.selectingItems])
       this.selectingItems.clear()
 
-      if (e.which === 1 && (this.mouseDownData.target === e.target || isMouseUpOnClickElement)) {
+      if (e.which === 1 && this.mouseDownData.target === e.target) {
         this.preventEvent(e.target, 'click')
       }
 
@@ -428,6 +413,24 @@ class SelectableGroup extends Component {
         boxHeight: 0,
       })
       this.props.onSelectionFinish([...this.selectedItems])
+    }
+
+    this.toggleSelectionMode()
+  }
+
+  handleClick(e, top, left) {
+    const isMouseUpOnClickElement = [...(e.target.classList || [])].indexOf(this.props.clickClassName) > -1
+
+    if (this.props.allowClickWithoutSelected || this.selectedItems.size || isMouseUpOnClickElement || this.ctrlPressed) {
+      this.selectItems({ top, left, offsetWidth: 0, offsetHeight: 0 }, { click: true })
+      this.props.onSelectionFinish([...this.selectedItems], this.clickedItem)
+
+      if (e.which === 1) {
+        this.preventEvent(e.target, 'click')
+      }
+      if (e.which === 2 || e.which === 3) {
+        this.preventEvent(e.target, 'contextmenu')
+      }
     }
   }
 

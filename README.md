@@ -82,8 +82,7 @@ class List extends Component {
 ## Configuration
 
 The `<SelectableGroup />` component accepts a few optional props:
-* `onSelectionStart` (Function) Callback.
-* `duringSelection` (Function) Callback fired rapidly during selection (while the selector is being dragged). Passes an array containing the keys of the items currently under the selector to the callback function.
+* `duringSelection` (Function) Callback fired rapidly during selection (while the selector is being dragged). Passes an array containing selectable items currently under the selector to the callback function.
 * `onSelectionFinish` (Function) Callback.
 * `onSelectionClear` (Function) Callback.
 * `scrollContainer` (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.
