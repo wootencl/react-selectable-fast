@@ -1,6 +1,6 @@
 {
   "name": "react-selectable-fast",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Enable other React components to be selectable by drawing a box with your mouse",
   "repository": {
     "type": "git",
@@ -26,7 +26,8 @@
     "performance",
     "drag",
     "touch",
-    "react"
+    "react",
+    "react-component"
   ],
   "author": "Valery Bugakov <skymk1@gmail.com>",
   "license": "MIT",

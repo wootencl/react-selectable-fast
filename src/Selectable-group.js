@@ -195,10 +195,12 @@ class SelectableGroup extends Component {
   }
 
   toggleSelectionMode() {
-    if (this.selectedItems.size && !this.state.selectionMode) {
+    const { selectedItems, state: { selectionMode } } = this
+
+    if (selectedItems.size && !selectionMode) {
       this.setState({ selectionMode: true })
     }
-    if (!this.selectedItems.size && this.state.selectionMode) {
+    if (!selectedItems.size && selectionMode) {
       this.setState({ selectionMode: false })
     }
   }
@@ -309,6 +311,7 @@ class SelectableGroup extends Component {
       }
       this.selectedItems.add(item)
     }
+    this.setState({ selectionMode: true })
     this.props.onSelectionFinish([...this.selectedItems])
   }
 
