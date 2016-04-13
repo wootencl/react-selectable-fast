@@ -1,6 +1,6 @@
 {
   "name": "react-selectable-fast",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Enable other React components to be selectable by drawing a box with your mouse",
   "repository": {
     "type": "git",
@@ -51,5 +51,9 @@
   "dependencies": {
     "babel-polyfill": "^6.7.4",
     "autobind-decorator": "^1.3.3"
-  }
+  },
+  "files": [
+    "lib",
+    "dist"
+  ]
 }
