@@ -1,6 +1,6 @@
 {
   "name": "react-selectable-fast",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Enable other React components to be selectable by drawing a box with your mouse",
   "repository": {
     "type": "git",
@@ -26,19 +26,16 @@
     "performance",
     "drag",
     "touch",
-    "react",
-    "react-component"
+    "react"
   ],
   "author": "Valery Bugakov <skymk1@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "autobind-decorator": "^1.3.3",
     "babel-cli": "^6.6.5",
     "babel-core": "^6.4.5",
     "babel-eslint": "^5.0.0",
     "babel-loader": "^6.2.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-polyfill": "^6.7.4",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
@@ -50,5 +47,9 @@
     "react-dom": "^15.0.0-rc.1",
     "webpack": "^1.12.11",
     "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.7.4",
+    "autobind-decorator": "^1.3.3"
   }
 }
