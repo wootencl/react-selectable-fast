@@ -329,7 +329,6 @@ class SelectableGroup extends Component {
     this.mouseDownStarted = true
     this.mouseUpStarted = false
     e = this.desktopEventCoords(e)
-
     if (this.inWhiteList(e.target)) {
       this.mouseDownStarted = false
       return
@@ -399,7 +398,7 @@ class SelectableGroup extends Component {
 
     if (!this.mouseDownData) return
 
-    const e = this.desktopEventCoords(event);
+    const e = this.desktopEventCoords(event)
 
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
     const { boxTop, boxLeft } = this.mouseDownData
@@ -409,7 +408,9 @@ class SelectableGroup extends Component {
       this.handleClick(e, scaledTop, scaledLeft)
     } else {
       for (const item of this.selectingItems.values()) {
-        item.setState({ selected: true, selecting: false })
+        if (!this.inWhiteList(item.node)) {
+          item.setState({ selected: true, selecting: false })
+        }
       }
       this.selectedItems = new Set([...this.selectedItems, ...this.selectingItems])
       this.selectingItems.clear()
