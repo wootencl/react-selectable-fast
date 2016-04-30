@@ -369,8 +369,11 @@ class SelectableGroup extends Component {
 
     e.preventDefault()
 
+
     document.addEventListener('mousemove', this.openSelectbox)
+    document.addEventListener('touchmove', this.openSelectbox)
     document.addEventListener('mouseup', this.mouseUp)
+    document.addEventListener('touchend', this.mouseUp)
   }
 
   preventEvent(target, type) {
@@ -383,16 +386,20 @@ class SelectableGroup extends Component {
   }
 
   @autobind
-  mouseUp(e) {
+  mouseUp(event) {
     if (this.mouseUpStarted) return
 
     this.mouseUpStarted = true
     this.mouseDownStarted = false
 
     document.removeEventListener('mousemove', this.openSelectbox)
+    document.removeEventListener('touchmove', this.openSelectbox)
     document.removeEventListener('mouseup', this.mouseUp)
+    document.removeEventListener('touchend', this.mouseUp)
 
     if (!this.mouseDownData) return
+
+    const e = this.desktopEventCoords(event);
 
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
     const { boxTop, boxLeft } = this.mouseDownData
@@ -456,8 +463,13 @@ class SelectableGroup extends Component {
    */
   desktopEventCoords(e) {
     if (e.pageX === undefined || e.pageY === undefined) { // Touch-device
-      e.pageX = e.targetTouches[0].pageX
-      e.pageY = e.targetTouches[0].pageY
+      if (e.targetTouches[0] !== undefined && e.targetTouches[0].pageX !== undefined) { // For touchmove
+        e.pageX = e.targetTouches[0].pageX
+        e.pageY = e.targetTouches[0].pageY
+      } else if (e.changedTouches[0] !== undefined && e.changedTouches[0].pageX !== undefined) { // For touchstart
+        e.pageX = e.changedTouches[0].pageX
+        e.pageY = e.changedTouches[0].pageY
+      }
     }
     return e
   }
