@@ -261,33 +261,41 @@ class SelectableGroup extends Component {
     selectboxBounds.left += this.scrollContainer.scrollLeft
 
     for (const item of this.registry.values()) {
-      const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance)
-      const { selecting, selected } = item.state
+      this.processItem(item, tolerance, dontClearSelection, selectboxBounds, click)
+    }
+  }
 
-      if (click && isCollided) {
-        if (selected) {
-          this.selectedItems.delete(item)
-        } else {
-          this.selectedItems.add(item)
-        }
-        item.setState({ selected: !selected })
-        this.clickedItem = item
+  processItem(item, tolerance, dontClearSelection, selectboxBounds, click) {
+    if (this.inWhiteList(item.node)) {
+      return
+    }
+
+    const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance)
+    const { selecting, selected } = item.state
+
+    if (click && isCollided) {
+      if (selected) {
+        this.selectedItems.delete(item)
+      } else {
+        this.selectedItems.add(item)
       }
+      item.setState({ selected: !selected })
+      return this.clickedItem = item
+    }
 
-      if (!click && isCollided && !selecting && !selected) {
-        item.setState({ selecting: true })
-        this.selectingItems.add(item)
-      }
+    if (!click && isCollided && !selecting && !selected) {
+      item.setState({ selecting: true })
+      return this.selectingItems.add(item)
+    }
 
-      if (!click && !isCollided && selecting) {
-        if (this.selectingItems.has(item)) {
+    if (!click && !isCollided && selecting) {
+      if (this.selectingItems.has(item)) {
+        item.setState({ selecting: false })
+        this.selectingItems.delete(item)
+      } else {
+        if (!dontClearSelection) {
           item.setState({ selecting: false })
-          this.selectingItems.delete(item)
-        } else {
-          if (!dontClearSelection) {
-            item.setState({ selecting: false })
-            this.selectedItems.delete(item)
-          }
+          this.selectedItems.delete(item)
         }
       }
     }
@@ -317,8 +325,7 @@ class SelectableGroup extends Component {
   }
 
   inWhiteList(target) {
-    const nodes = [...document.querySelectorAll(this.whiteList.join(', '))]
-    return nodes.some(node => (
+    return [...this.whiteListNodes].some(node => (
       target === node || node.contains(target)
     ))
   }
@@ -329,6 +336,8 @@ class SelectableGroup extends Component {
     this.mouseDownStarted = true
     this.mouseUpStarted = false
     e = this.desktopEventCoords(e)
+
+    this.whiteListNodes = document.querySelectorAll(this.whiteList.join(', '))
     if (this.inWhiteList(e.target)) {
       this.mouseDownStarted = false
       return
@@ -408,9 +417,7 @@ class SelectableGroup extends Component {
       this.handleClick(e, scaledTop, scaledLeft)
     } else {
       for (const item of this.selectingItems.values()) {
-        if (!this.inWhiteList(item.node)) {
-          item.setState({ selected: true, selecting: false })
-        }
+        item.setState({ selected: true, selecting: false })
       }
       this.selectedItems = new Set([...this.selectedItems, ...this.selectingItems])
       this.selectingItems.clear()

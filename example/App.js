@@ -53,7 +53,7 @@ class App extends Component {
           globalMouse={this.state.isGlobal}
           tolerance={this.state.tolerance}
           distance={this.state.distance}
-          whiteList={['.not-selectable']}
+          whiteList={['.not-selectable', '.item:nth-child(10)']}
           allowClickWithoutSelected={false}
           dontClearSelection
         >
