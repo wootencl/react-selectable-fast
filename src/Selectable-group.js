@@ -314,11 +314,12 @@ class SelectableGroup extends Component {
 
   @autobind
   selectAll() {
+    this.updateWhiteListNodes()
     for (const item of this.registry.values()) {
-      if (!item.state.selected) {
+      if (!this.inWhiteList(item.node) && !item.state.selected) {
         item.setState({ selected: true })
+        this.selectedItems.add(item)
       }
-      this.selectedItems.add(item)
     }
     this.setState({ selectionMode: true })
     this.props.onSelectionFinish([...this.selectedItems])
@@ -330,6 +331,10 @@ class SelectableGroup extends Component {
     ))
   }
 
+  updateWhiteListNodes() {
+    this.whiteListNodes = document.querySelectorAll(this.whiteList.join(', '))
+  }
+
   @autobind
   mouseDown(e) {
     if (this.mouseDownStarted) return
@@ -337,7 +342,7 @@ class SelectableGroup extends Component {
     this.mouseUpStarted = false
     e = this.desktopEventCoords(e)
 
-    this.whiteListNodes = document.querySelectorAll(this.whiteList.join(', '))
+    this.updateWhiteListNodes()
     if (this.inWhiteList(e.target)) {
       this.mouseDownStarted = false
       return
