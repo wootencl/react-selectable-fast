@@ -1,112 +1,162 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body {
-      font-family: Helvetica, sans-serif;
-      padding: 0 20px;
-    }
-    h1 {
-      text-align:center;
-    }
-    .sidebar {
-      width: 300px;
-      float: left;
-      line-height: 150%;
-    }
-    .info {
-      position: fixed;
-      top: 70px;
-      left: 50px;
-      width: 250px;
-    }
-    .main {
-      padding: 0 10px;
-      border: 1px solid darkcyan;
-      overflow: hidden;
-      height: 80vh;
-      overflow: scroll;
-      position: relative;
-    }
-    .selectable-selectbox {
-      z-index: 9000;
-      position: absolute;
-      cursor: default;
-      background: none;
-      border: 1px dashed grey;
-    }
-    .album-label {
-      display: block;
-      margin: 5px 0;
-      font-size: smaller;
-    }
-    .item {
-      position: relative;
-      width: 110px;
-      height: 110px;
-      margin: 2px;
-      float: left;
-      text-align: center;
-      border: 1px solid #ccc;
-      padding: 10px;
-      overflow: hidden;
-    }
-    .item .tick {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      font-size: 10px;
-      color: #009688;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .item h2 {
-      font-size: 14px;
-      margin-top: 0;
-    }
-    .item.selected {
-      background: rebeccapurple;
-      color: white;
-    }
-    .item.selecting {
-      border: 1px solid rebeccapurple;
-    }
-    .not-selectable {
-      display: inline-block;
-      margin: 1em 5px;
-      color: #4285f4;
-    }
-    .counter {
-      color: #009688;
-    }
-    .selectable-button {
-      display: inline-block;
-      margin: 3px;
-    }
-    .in-selection-mode .item {
-      cursor: pointer;
-    }
-    button {
-      display: inline-block;
-      position: relative;
-      width: 121px;
-      height: 32px;
-      line-height: 32px;
-      border-radius: 2px;
-      font-size: 0.9em;
-      background-color: #4285f4;
-      color: #fff;
-      border: none;
-      outline: none;
-      padding: 0;
-    }
-  </style>
-</head>
-<body>
-  <a href="https://github.com/valerybugakov">
-    <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png">
-  </a>
-  <div id="app"></div>
-  <script src="./bundle.js"></script>
-</body>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>React-selectable-fast by valerybugakov</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="./styles/normalize.css" media="screen" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href="./styles/stylesheet.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="./styles/github-light.css" media="screen" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <a href="https://github.com/valerybugakov">
+      <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png">
+    </a>
+    <section class="page-header">
+      <h1 class="project-name">React-selectable-fast</h1>
+      <h2 class="project-tagline">A lightweight responsive line chart component for React using only SVG</h2>
+      <a class="btn" href="https://github.com/cedricdelpoux/react-svg-line-chart">View on GitHub</a>
+      <a class="btn" href="https://github.com/cedricdelpoux/react-svg-line-chart/zipball/master">Download .zip</a>
+      <a class="btn" href="https://github.com/cedricdelpoux/react-svg-line-chart/tarball/master">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+        react-selectable-fast
+        <img alt="npm" src="https://img.shields.io/npm/v/react-svg-line-chart.svg">
+        <img alt="license" src="https://img.shields.io/npm/l/react-svg-line-chart.svg">
+        <img alt="github-issues" src="https://img.shields.io/github/issues/cedricdelpoux/react-svg-line-chart.svg">
+      </h1>
+      <p>A lightweight responsive line chart component for React using only SVG</p>
+
+      <h2>
+        <a class="anchor" href="#install" id="install">
+          <span class="octicon octicon-link"></span>
+        </a>
+        Install
+      </h2>
+      <div class="highlight highlight-sh">
+        <pre>
+          npm i -S react-selectable-fast
+        </pre>
+      </div>
+      <p>
+        <a href="https://nodei.co/npm/react-svg-line-chart/">
+          <img alt="react-svg-line-chart" src="https://nodei.co/npm/react-svg-line-chart.png?downloads=true&amp;downloadRank=true&amp;stars=true">
+        </a>
+      </p>
+
+      <h2><a class="anchor" href="#demo" id="demo"><span class="octicon octicon-link"></span></a>Demo</h2>
+      <div id="demo-container"></div>
+      <h2><a class="anchor" href="#usage" id="usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+      <h3><a class="anchor" href="#exemple" id="exemple"><span class="octicon octicon-link"></span></a>Example</h3>
+      <p>Package exports 4 entities <code>{ SelectableGroup, createSelectable, SelectAll, DeselectAll }</code>.
+To make other components selectable create selectable component with <code>createSelectable</code> function and put list of them under <code>SelectableGroup</code>.</p>
+      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span>, <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> { <span class="pl-smi">SelectableGroup</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
+
+<span class="pl-k">class</span> <span class="pl-en">App</span> <span class="pl-k">extends</span> <span class="pl-e">Component</span> {
+  <span class="pl-k">...</span>
+
+  <span class="pl-en">render</span>() {
+    <span class="pl-k">return</span> (
+      <span class="pl-k">&lt;</span>SelectableGroup
+        className<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>main<span class="pl-pds">"</span></span>
+        clickableClassName<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>tick<span class="pl-pds">"</span></span>
+        onSelectionStart<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionStart</span>}
+        duringSelection<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelecting</span>}
+        onSelectionFinish<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionFinish</span>}
+        onSelectionClear<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionClear</span>}
+        globalMouse<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">isGlobal</span>}
+        tolerance<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">tolerance</span>}
+        distance<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">distance</span>}
+        whiteList<span class="pl-k">=</span>{[<span class="pl-s"><span class="pl-pds">'</span>.not-selectable<span class="pl-pds">'</span></span>]}
+        allowClickWithoutSelected<span class="pl-k">=</span>{<span class="pl-c1">false</span>}
+        dontClearSelection
+      <span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>List items<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">props</span>.<span class="pl-smi">items</span>} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+      <span class="pl-k">&lt;</span><span class="pl-k">/</span>SelectableGroup<span class="pl-k">&gt;</span>
+    )
+  }
+}</pre></div>
+      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span>, <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> { <span class="pl-smi">createSelectable</span>, <span class="pl-smi">SelectAll</span>, <span class="pl-smi">DeselectAll</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-smi">SomeComponent</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./SomeComponent<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">SelectableComponent</span> <span class="pl-k">=</span> <span class="pl-en">createSelectable</span>(SomeComponent)
+
+<span class="pl-k">class</span> <span class="pl-en">List</span> <span class="pl-k">extends</span> <span class="pl-e">Component</span> {
+  <span class="pl-k">...</span>
+
+  <span class="pl-en">render</span>() {
+    <span class="pl-k">return</span> (
+      <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>SelectAll className<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>selectable-button<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
+          <span class="pl-k">&lt;</span>button<span class="pl-k">&gt;</span><span class="pl-c1">Select</span> all<span class="pl-k">&lt;</span><span class="pl-k">/</span>button<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span><span class="pl-k">/</span>SelectAll<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span>DeselectAll className<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>selectable-button<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
+          <span class="pl-k">&lt;</span>button<span class="pl-k">&gt;</span>Clear selection<span class="pl-k">&lt;</span><span class="pl-k">/</span>button<span class="pl-k">&gt;</span>
+        <span class="pl-k">&lt;</span><span class="pl-k">/</span>DeselectAll<span class="pl-k">&gt;</span>
+        {<span class="pl-v">this</span>.<span class="pl-smi">props</span>.<span class="pl-smi">items</span>.<span class="pl-en">map</span>((<span class="pl-smi">item</span>, <span class="pl-smi">i</span>) <span class="pl-k">=&gt;</span> (
+          <span class="pl-k">&lt;</span>SelectableComponent
+            key<span class="pl-k">=</span>{i}
+            title<span class="pl-k">=</span>{<span class="pl-smi">item</span>.<span class="pl-c1">title</span>}
+            year<span class="pl-k">=</span>{<span class="pl-smi">item</span>.<span class="pl-smi">year</span>}
+          <span class="pl-k">/</span><span class="pl-k">&gt;</span>
+        ))}
+      <span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+    )
+  }
+}</pre></div>
+      <h3><a class="anchor" href="#props" id="props"><span class="octicon octicon-link"></span></a>Configuration</h3>
+      <ul>
+        <li><code>duringSelection</code> (Function) Callback fired rapidly during selection (while the selector is being dragged). Passes an array containing selectable items currently under the selector to the callback function.</li>
+        <li><code>onSelectionFinish</code> (Function) Callback.</li>
+        <li><code>onSelectionClear</code> (Function) Callback.</li>
+        <li><code>scrollContainer</code> (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.</li>
+        <li><code>whiteList</code> (Array) Array of whitelisted selectors.</li>
+        <li><code>clickableClassName</code> (String) On element with specified selector click item cotaining this element will be selected.</li>
+        <li><code>tolerance</code> (Number) The amount of buffer to add around your <code>&lt;SelectableGroup /&gt;</code> container, in pixels.</li>
+        <li><code>className</code> (String) Class of selectable group element.</li>
+        <li><code>selectionModeClass</code> (String) Class indicating that there are more than 1 selected item. Defaults to 'in-selection-mode'.</li>
+        <li><code>component</code> (String) The component to render. Defaults to <code>div</code>.</li>
+        <li><code>allowClickWithoutSelected</code> (Boolean) When disabled items can be selected by click only if there are more than 1 already selected item.</li>
+        <li><code>fixedPosition</code> (Boolean) Whether the <code>&lt;SelectableGroup /&gt;</code> container is a fixed/absolute position element or the grandchild of one.</li>
+        <li><code>dontClearSelection</code> (Boolean) When enabled, makes all new selections add to the already selected items, except for selections that contain <em>only</em> previously selected items—in this case it unselects those items.</li>
+      </ul>
+      <h2><a class="anchor" href="#development" id="development"><span class="octicon octicon-link"></span></a>Development</h2>
+      <h3><a class="anchor" href="#clean-lib-folder" id="clean-lib-folder"><span class="octicon octicon-link"></span></a>Clean <code>lib</code> folder</h3>
+      <div class="highlight highlight-js">
+        <pre>
+npm run clean
+</pre>
+      </div>
+      <h3><a class="anchor" href="#build-lib-folder" id="build-lib-folder"><span class="octicon octicon-link"></span></a>Build <code>lib</code> folder</h3>
+      <div class="highlight highlight-js">
+        <pre>
+npm run build
+</pre>
+      </div>
+      <h3><a class="anchor" href="#watch-src-folder" id="watch-src-folder"><span class="octicon octicon-link"></span></a>Watch <code>src</code> folder</h3>
+      <div class="highlight highlight-js">
+        <pre>
+npm run watch
+</pre>
+      </div>
+      <h3><a class="anchor" href="#lint-src-folder" id="lint-src-folder"><span class="octicon octicon-link"></span></a>Lint <code>src</code> folder</h3>
+      <div class="highlight highlight-js">
+        <pre>
+npm run build
+</pre>
+      </div>
+      <h2><a class="anchor" href="#license" id="license"><span class="octicon octicon-link"></span></a>License</h2>
+      <p>See <a href="./LICENCE">MIT</a></p>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/cedricdelpoux/react-svg-line-chart">React-svg-line-chart</a></span>
+      </footer>
+      <span class="site-footer-owner"></span>
+    </section>
+    <script src="./bundle.js"></script>
+  </body>
 </html>
