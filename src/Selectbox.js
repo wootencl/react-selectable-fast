@@ -8,7 +8,7 @@ class Selectbox extends Component {
   }
 
   static defaultProps = {
-    className: 'selectable-selectbox'
+    className: 'selectable-selectbox',
   }
 
   constructor() {

@@ -15,8 +15,8 @@ Main idea of this fork is to eliminate render during selection caused by state u
 npm install react-selectable-fast
 ```
 
-Package exports 4 entities `{ SelectableGroup, createSelectable, SelectAll, DeselectAll }`.
-To make other components selectable create selectable component with `createSelectable` function and put list of them under `SelectableGroup`.
+Package exports 4 components `{ SelectableGroup, createSelectable, SelectAll, DeselectAll }`.
+To make other components selectable create selectable component with `createSelectable` function and put a list of them under `SelectableGroup`.
 
 ```js
 import React, { Component, PropTypes } from 'react'
@@ -30,13 +30,11 @@ class App extends Component {
       <SelectableGroup
         className="main"
         clickableClassName="tick"
-        onSelectionStart={this.handleSelectionStart}
         duringSelection={this.handleSelecting}
         onSelectionFinish={this.handleSelectionFinish}
         onSelectionClear={this.handleSelectionClear}
         globalMouse={this.state.isGlobal}
         tolerance={this.state.tolerance}
-        distance={this.state.distance}
         whiteList={['.not-selectable']}
         allowClickWithoutSelected={false}
         dontClearSelection

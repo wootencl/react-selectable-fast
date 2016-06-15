@@ -21,13 +21,15 @@ class List extends Component {
             <button>Clear selection</button>
           </DeselectAll>
         </div>
-        {this.props.items.map((item, i) => (
-          <SelectableAlbum
-            key={i}
-            title={item.title}
-            year={item.year}
-          />
-        ))}
+        <div className="albums">
+          {this.props.items.map((item, i) => (
+            <SelectableAlbum
+              key={i}
+              title={item.title}
+              year={item.year}
+            />
+          ))}
+        </div>
       </div>
     )
   }

@@ -6,9 +6,12 @@
   "parser": "babel-eslint",
   "extends": "airbnb",
   "rules": {
-    "semi": [1, "never"],
+    "semi": [2, "never"],
     "no-param-reassign": 0,
+    "no-return-assign": 0,
     "react/sort-comp": 0,
+    "react/prop-types": 0,
+    "react/jsx-indent": 0,
   },
 }
 

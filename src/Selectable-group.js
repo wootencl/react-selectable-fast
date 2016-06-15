@@ -9,7 +9,6 @@ import Selectbox from './Selectbox'
 class SelectableGroup extends Component {
   static propTypes = {
     scale: PropTypes.number,
-    distance: PropTypes.number,
     globalMouse: PropTypes.bool,
     whiteList: PropTypes.array,
     scrollSpeed: PropTypes.number,
@@ -65,7 +64,6 @@ class SelectableGroup extends Component {
 
   static defaultProps = {
     component: 'div',
-    distance: 0,
     tolerance: 0,
     globalMouse: false,
     whiteList: [],
@@ -96,7 +94,9 @@ class SelectableGroup extends Component {
     this.registry = new Set()
     this.selectedItems = new Set()
     this.selectingItems = new Set()
-    this.whiteList = this.props.whiteList.concat(['.selectable-select-all', '.selectable-deselect-all'])
+    this.whiteList = this.props.whiteList.concat(
+      ['.selectable-select-all', '.selectable-deselect-all']
+    )
   }
 
   getChildContext() {
@@ -222,13 +222,17 @@ class SelectableGroup extends Component {
     const windowScroll = isChrome ? window.scrollY : document.documentElement.scrollTop
 
     const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - windowScroll)
-    let boxTop = applyContainerScroll(this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - windowScroll)
+    let boxTop = applyContainerScroll(
+      this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - windowScroll
+    )
     const h = boxTop - top
     boxTop = Math.min(boxTop - h, boxTop)
 
     const w = this.mouseDownData.boxLeft - scaledLeft
     const leftContainerRelative = this.mouseDownData.boxLeft - this.scrollBounds.left
-    const boxLeft = Math.min(leftContainerRelative - w / this.props.scale, leftContainerRelative / this.props.scale)
+    const boxLeft = Math.min(
+      leftContainerRelative - w / this.props.scale, leftContainerRelative / this.props.scale
+    )
 
     this.updatedSelecting()
 
@@ -267,7 +271,7 @@ class SelectableGroup extends Component {
 
   processItem(item, tolerance, dontClearSelection, selectboxBounds, click) {
     if (this.inWhiteList(item.node)) {
-      return
+      return null
     }
 
     const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance)
@@ -299,6 +303,8 @@ class SelectableGroup extends Component {
         }
       }
     }
+
+    return null
   }
 
   @autobind
@@ -443,9 +449,15 @@ class SelectableGroup extends Component {
   }
 
   handleClick(e, top, left) {
-    const isMouseUpOnClickElement = [...(e.target.classList || [])].indexOf(this.props.clickClassName) > -1
+    const isMouseUpOnClickElement =
+      [...(e.target.classList || [])].indexOf(this.props.clickClassName) > -1
 
-    if (this.props.allowClickWithoutSelected || this.selectedItems.size || isMouseUpOnClickElement || this.ctrlPressed) {
+    if (
+      this.props.allowClickWithoutSelected ||
+      this.selectedItems.size ||
+      isMouseUpOnClickElement ||
+      this.ctrlPressed
+    ) {
       this.selectItems({ top, left, offsetWidth: 0, offsetHeight: 0 }, { click: true })
       this.props.onSelectionFinish([...this.selectedItems], this.clickedItem)
 
@@ -476,10 +488,16 @@ class SelectableGroup extends Component {
    */
   desktopEventCoords(e) {
     if (e.pageX === undefined || e.pageY === undefined) { // Touch-device
-      if (e.targetTouches[0] !== undefined && e.targetTouches[0].pageX !== undefined) { // For touchmove
+      if (
+        e.targetTouches[0] !== undefined &&
+        e.targetTouches[0].pageX !== undefined
+      ) { // For touchmove
         e.pageX = e.targetTouches[0].pageX
         e.pageY = e.targetTouches[0].pageY
-      } else if (e.changedTouches[0] !== undefined && e.changedTouches[0].pageX !== undefined) { // For touchstart
+      } else if (
+        e.changedTouches[0] !== undefined &&
+        e.changedTouches[0].pageX !== undefined
+      ) { // For touchstart
         e.pageX = e.changedTouches[0].pageX
         e.pageY = e.changedTouches[0].pageY
       }
@@ -491,8 +509,10 @@ class SelectableGroup extends Component {
     return (
       <this.props.component
         ref="selectableGroup"
-        className={`${this.props.className} ${this.state.selectionMode ? this.props.selectionModeClass : ''}`}
         style={this.props.style}
+        className={
+          `${this.props.className} ${this.state.selectionMode ? this.props.selectionModeClass : ''}`
+        }
       >
         <Selectbox fixedPosition={this.props.fixedPosition} ref="selectbox" />
         {this.props.children}

@@ -1,19 +1,22 @@
 {
   "name": "react-selectable-fast",
-  "version": "0.1.7",
-  "description": "Enable other React components to be selectable by drawing a box with your mouse",
+  "version": "1.0.0",
+  "description": "Enable other React components to be selectable by drawing a box with your mouse/touch",
   "repository": {
     "type": "git",
     "url": "git://github.com/valerybugakov/react-selectable-fast.git"
   },
   "main": "lib/index.js",
   "scripts": {
-    "example": "webpack-dev-server --config ./example/webpack.config.js --content-base example",
+    "clean": "rimraf ./lib ./dist",
+    "lint": "eslint ./src",
+    "watch:example": "webpack-dev-server --config ./example/webpack.config.js --content-base example",
     "build:example": "webpack --config ./example/webpack.config.js",
-    "watch": "node node_modules/webpack/bin/webpack --watch",
-    "build": "node node_modules/webpack/bin/webpack",
+    "watch": "webpack --watch",
+    "build": "webpack",
+    "lib": "babel ./src/ -d ./lib/",
     "dist": "NODE_ENV=production webpack -p --config webpack.production.config.js",
-    "prepublish": "babel ./src/ -d ./lib/"
+    "prepublish": "npm run lint && npm run clean && npm run dist && npm run lib"
   },
   "bugs": {
     "url": "https://github.com/valerybugakov/react-selectable-fast/issues"
@@ -34,18 +37,21 @@
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-core": "^6.9.1",
-    "babel-eslint": "^5.0.0",
+    "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
-    "eslint": "^2.2.0",
-    "eslint-config-airbnb": "^6.0.2",
-    "eslint-plugin-babel": "^3.1.0",
-    "eslint-plugin-react": "^4.1.0",
+    "eslint": "^2.12.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-babel": "^3.2.0",
+    "eslint-plugin-import": "^1.8.1",
+    "eslint-plugin-jsx-a11y": "^1.4.2",
+    "eslint-plugin-react": "^5.1.1",
     "react": "^15.0.0-rc.1",
     "react-dom": "^15.0.0-rc.1",
+    "rimraf": "^2.5.2",
     "webpack": "^1.12.11",
     "webpack-dev-server": "^1.14.1"
   },

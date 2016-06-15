@@ -1,5 +1,6 @@
 * {
-  box-sizing: border-box; }
+  box-sizing: border-box;
+}
 
 body {
   padding: 0;
@@ -7,13 +8,19 @@ body {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #606c71; }
+  color: #606c71;
+}
 
 a {
   color: #1e6bb8;
-  text-decoration: none; }
-  a:hover {
-    text-decoration: underline; }
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Gh-pages theme */
 
 .btn {
   display: inline-block;
@@ -243,3 +250,98 @@ a {
 @media screen and (max-width: 42em) {
   .site-footer {
     font-size: 0.9rem; } }
+
+/* Demo specifics */
+
+.main {
+  padding: 0 10px;
+  border: 1px solid darkcyan;
+  overflow: hidden;
+  height: 80vh;
+  overflow: scroll;
+  position: relative;
+}
+.selectable-selectbox {
+  z-index: 9000;
+  position: absolute;
+  cursor: default;
+  background: none;
+  border: 1px dashed grey;
+}
+.albums {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.album-label {
+  display: block;
+  margin: 5px 0;
+  font-size: smaller;
+}
+.item {
+  position: relative;
+  width: 145px;
+  min-height: 125px;
+  margin: 2px;
+  float: left;
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  overflow: hidden;
+}
+.item:nth-child(10),
+.item:nth-child(27) {
+  background: silver;
+}
+.item .tick {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 10px;
+  color: #009688;
+  font-weight: bold;
+  cursor: pointer;
+}
+.item h2 {
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 0;
+  color: inherit;
+  font-weight: 600;
+}
+.item.selected {
+  background: rebeccapurple;
+  color: white;
+}
+.item.selecting {
+  border: 1px solid rebeccapurple;
+}
+.not-selectable {
+  display: inline-block;
+  margin: 1em 5px;
+  color: #4285f4;
+}
+.counter {
+  color: #009688;
+}
+.selectable-button {
+  display: inline-block;
+  margin: 3px;
+}
+.in-selection-mode .item {
+  cursor: pointer;
+}
+button {
+  display: inline-block;
+  position: relative;
+  width: 121px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 2px;
+  font-size: 0.9em;
+  background-color: #4285f4;
+  color: #fff;
+  border: none;
+  outline: none;
+  padding: 0;
+}

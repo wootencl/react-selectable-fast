@@ -11,7 +11,6 @@ class App extends Component {
       selectedItems: [],
       selectingItems: [],
       tolerance: 0,
-      distance: 0,
     }
   }
 
@@ -29,10 +28,6 @@ class App extends Component {
     console.log(`Finished selection ${selectedItems.length}`)
   }
 
-  handleSelectionStart() {
-    console.log('Started selection')
-  }
-
   handleSelectionClear() {
     console.log('Cancel selection')
   }
@@ -40,20 +35,20 @@ class App extends Component {
   render() {
     return (
       <div>
-        <h1>React Selectable Fast Demo</h1>
-        <p>Selecting: <span className="counter">{this.state.selectingItems.length}</span></p>
-        <p>Selected: <span className="counter">{this.state.selectedItems.length}</span></p>
+        <p>
+          Selecting: <span className="counter">{this.state.selectingItems.length}</span>
+          <br />
+          Selected: <span className="counter">{this.state.selectedItems.length}</span>
+        </p>
         <SelectableGroup
           className="main"
           clickClassName="tick"
-          onSelectionStart={this.handleSelectionStart}
           duringSelection={this.handleSelecting}
           onSelectionFinish={this.handleSelectionFinish}
           onSelectionClear={this.handleSelectionClear}
           globalMouse={this.state.isGlobal}
           tolerance={this.state.tolerance}
-          distance={this.state.distance}
-          whiteList={['.not-selectable', '.item:nth-child(10)']}
+          whiteList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
           allowClickWithoutSelected={false}
           dontClearSelection
         >
