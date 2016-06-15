@@ -1,19 +1,24 @@
-# Selectable scrollable items for React
+# React-selectable-fast ![npm](https://img.shields.io/npm/v/react-selectable-fast.svg) ![license](https://img.shields.io/npm/l/react-selectable-fast.svg) ![github-issues](https://img.shields.io/github/issues/valerybugakov/react-selectable-fast.svg)
 
-Allows individual or group selection of items using the mouse/touch.
+Enable a React component (or group of components) to be selectable via mouse/touch.
 
 ## Demo
-[Try it out](http://valerybugakov.github.io/react-selectable-fast)
+
+http://valerybugakov.github.io/react-selectable-fast
+
+## Install
+
+```sh
+npm i -S react-selectable-fast
+```
+
+[![react-selectable-fast](https://nodei.co/npm/react-selectable-fast.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/react-selectable-fast/)
 
 ## Based on react-selectable
 This project is based on [react-selectable](https://github.com/unclecheese/react-selectable) by [unclecheese](https://github.com/unclecheese).
 Main idea of this fork is to eliminate render during selection caused by state updates of SelectableGroup. Only items under selectbox rerender themself, which great for big lists of selectable items. Also this package extends the original functionality with ability to scroll items while selecting relative to window and specified scroll container.
 
-
-## Getting started
-```
-npm install react-selectable-fast
-```
+## Usage
 
 Package exports 4 components `{ SelectableGroup, createSelectable, SelectAll, DeselectAll }`.
 To make other components selectable create selectable component with `createSelectable` function and put a list of them under `SelectableGroup`.
