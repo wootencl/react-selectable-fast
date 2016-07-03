@@ -215,23 +215,25 @@ class SelectableGroup extends Component {
     this.mouseMoveStarted = true
 
     const scrollTop = this.scrollContainer.scrollTop
-    const applyContainerScroll = (top, scroll) => top + scroll / this.props.scale
+    const applyContainerScroll = (value, scroll) => value + scroll / this.props.scale
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
 
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
-    const windowScroll = isChrome ? window.scrollY : document.documentElement.scrollTop
+    const windowTopScroll = isChrome ? window.scrollY : document.documentElement.scrollTop
+    const windowLeftScroll = isChrome ? window.scrollX : document.documentElement.scrollLeft
 
-    const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - windowScroll)
+    const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - windowTopScroll)
     let boxTop = applyContainerScroll(
-      this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - windowScroll
+      this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - windowTopScroll
     )
     const h = boxTop - top
     boxTop = Math.min(boxTop - h, boxTop)
-
     const w = this.mouseDownData.boxLeft - scaledLeft
     const leftContainerRelative = this.mouseDownData.boxLeft - this.scrollBounds.left
-    const boxLeft = Math.min(
-      leftContainerRelative - w / this.props.scale, leftContainerRelative / this.props.scale
+    const boxLeft = applyContainerScroll(
+      Math.min(
+        leftContainerRelative - w / this.props.scale, leftContainerRelative / this.props.scale
+      ), -windowLeftScroll
     )
 
     this.updatedSelecting()
