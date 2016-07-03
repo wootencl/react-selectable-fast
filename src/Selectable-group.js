@@ -224,7 +224,8 @@ class SelectableGroup extends Component {
 
     const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - windowTopScroll)
     let boxTop = applyContainerScroll(
-      this.mouseDownData.boxTop - this.scrollBounds.top, this.mouseDownData.scrollTop - windowTopScroll
+      this.mouseDownData.boxTop - this.scrollBounds.top,
+      this.mouseDownData.scrollTop - windowTopScroll
     )
     const h = boxTop - top
     boxTop = Math.min(boxTop - h, boxTop)
