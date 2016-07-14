@@ -51,7 +51,7 @@
       <h3><a class="anchor" href="#exemple" id="exemple"><span class="octicon octicon-link"></span></a>Example</h3>
       <p>Package exports 4 components <code>{ SelectableGroup, createSelectable, SelectAll, DeselectAll }</code>.
 To make other components selectable create selectable component with <code>createSelectable()</code> function and put a list of them under <code>SelectableGroup</code>.</p>
-      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span>, <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
+      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> { <span class="pl-smi">SelectableGroup</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
 
 <span class="pl-k">class</span> <span class="pl-en">App</span> <span class="pl-k">extends</span> <span class="pl-e">Component</span> {
@@ -61,22 +61,23 @@ To make other components selectable create selectable component with <code>creat
     <span class="pl-k">return</span> (
       <span class="pl-k">&lt;</span>SelectableGroup
         className<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>main<span class="pl-pds">"</span></span>
-        clickableClassName<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>tick<span class="pl-pds">"</span></span>
-        duringSelection<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelecting</span>}
-        onSelectionFinish<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionFinish</span>}
-        onSelectionClear<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionClear</span>}
-        globalMouse<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">isGlobal</span>}
-        tolerance<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">tolerance</span>}
-        whiteList<span class="pl-k">=</span>{[<span class="pl-s"><span class="pl-pds">'</span>.not-selectable<span class="pl-pds">'</span></span>]}
-        allowClickWithoutSelected<span class="pl-k">=</span>{<span class="pl-c1">false</span>}
+        clickClassName<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>tick<span class="pl-pds">"</span></span>
+        enableDeselect
         dontClearSelection
+        tolerance<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">tolerance</span>}
+        globalMouse<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">state</span>.<span class="pl-smi">isGlobal</span>}
+        allowClickWithoutSelected<span class="pl-k">=</span>{<span class="pl-c1">false</span>}
+        duringSelection<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelecting</span>}
+        onSelectionClear<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionClear</span>}
+        onSelectionFinish<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionFinish</span>}
+        whiteList<span class="pl-k">=</span>{[<span class="pl-s"><span class="pl-pds">'</span>.not-selectable<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.item:nth-child(10)<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.item:nth-child(27)<span class="pl-pds">'</span></span>]}
       <span class="pl-k">&gt;</span>
         <span class="pl-k">&lt;</span>List items<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">props</span>.<span class="pl-smi">items</span>} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
       <span class="pl-k">&lt;</span><span class="pl-k">/</span>SelectableGroup<span class="pl-k">&gt;</span>
     )
   }
 }</pre></div>
-      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span>, <span class="pl-smi">PropTypes</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
+      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> { <span class="pl-smi">createSelectable</span>, <span class="pl-smi">SelectAll</span>, <span class="pl-smi">DeselectAll</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">SomeComponent</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./SomeComponent<span class="pl-pds">'</span></span>
 
@@ -110,6 +111,8 @@ To make other components selectable create selectable component with <code>creat
         <li><code>duringSelection</code> (Function) Callback fired rapidly during selection (while the selector is being dragged). Passes an array containing selectable items currently under the selector to the callback function.</li>
         <li><code>onSelectionFinish</code> (Function) Callback.</li>
         <li><code>onSelectionClear</code> (Function) Callback.</li>
+        <li><code>enableDeselect</code> (Boolean) Enables deselect with selectbox.</li>
+        <li><code>mixedDeselect</code> (Boolean) When enabled items can be selected and deselected with selectbox at the same time, <code>enableDeselect</code> should be set to <code>true</code>.</li>
         <li><code>scrollContainer</code> (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.</li>
         <li><code>whiteList</code> (Array) Array of whitelisted selectors.</li>
         <li><code>clickableClassName</code> (String) On element with specified selector click item cotaining this element will be selected.</li>
@@ -119,10 +122,9 @@ To make other components selectable create selectable component with <code>creat
         <li><code>component</code> (String) The component to render. Defaults to <code>div</code>.</li>
         <li><code>allowClickWithoutSelected</code> (Boolean) When disabled items can be selected by click only if there are more than 1 already selected item.</li>
         <li><code>fixedPosition</code> (Boolean) Whether the <code>&lt;SelectableGroup /&gt;</code> container is a fixed/absolute position element or the grandchild of one.</li>
-        <li><code>dontClearSelection</code> (Boolean) When enabled, makes all new selections add to the already selected items, except for selections that contain <em>only</em> previously selected items—in this case it unselects those items.</li>
       </ul>
       <h2><a class="anchor" href="#development" id="development"><span class="octicon octicon-link"></span></a>Development</h2>
-      <h3><a class="anchor" href="#clean-lib-folder" id="clean-lib-folder"><span class="octicon octicon-link"></span></a>Clean <code>lib</code> and <code>dist</code> folders</h3>
+      <h3><a class="anchor" href="#clean-lib-folder" id="clean-lib-folder"><span class="octicon octicon-link"></span></a>Clean <code>lib and dist</code> folders</h3>
       <div class="highlight highlight-js">
         <pre>npm run clean</pre>
       </div>
