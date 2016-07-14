@@ -44,7 +44,6 @@ class App extends Component {
           className="main"
           clickClassName="tick"
           enableDeselect
-          dontClearSelection
           tolerance={this.state.tolerance}
           globalMouse={this.state.isGlobal}
           allowClickWithoutSelected={false}
