@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import autobind from 'autobind-decorator'
 import { SelectableGroup } from '../src'
 import List from './List'
@@ -43,14 +43,15 @@ class App extends Component {
         <SelectableGroup
           className="main"
           clickClassName="tick"
-          duringSelection={this.handleSelecting}
-          onSelectionFinish={this.handleSelectionFinish}
-          onSelectionClear={this.handleSelectionClear}
-          globalMouse={this.state.isGlobal}
-          tolerance={this.state.tolerance}
-          whiteList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
-          allowClickWithoutSelected={false}
+          enableDeselect
           dontClearSelection
+          tolerance={this.state.tolerance}
+          globalMouse={this.state.isGlobal}
+          allowClickWithoutSelected={false}
+          duringSelection={this.handleSelecting}
+          onSelectionClear={this.handleSelectionClear}
+          onSelectionFinish={this.handleSelectionFinish}
+          whiteList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
         >
           <List items={this.props.items} />
         </SelectableGroup>

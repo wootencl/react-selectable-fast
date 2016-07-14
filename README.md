@@ -24,7 +24,7 @@ Package exports 4 components `{ SelectableGroup, createSelectable, SelectAll, De
 To make other components selectable create selectable component with `createSelectable` function and put a list of them under `SelectableGroup`.
 
 ```js
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { SelectableGroup } from 'react-selectable-fast'
 
 class App extends Component {
@@ -34,15 +34,16 @@ class App extends Component {
     return (
       <SelectableGroup
         className="main"
-        clickableClassName="tick"
-        duringSelection={this.handleSelecting}
-        onSelectionFinish={this.handleSelectionFinish}
-        onSelectionClear={this.handleSelectionClear}
-        globalMouse={this.state.isGlobal}
-        tolerance={this.state.tolerance}
-        whiteList={['.not-selectable']}
-        allowClickWithoutSelected={false}
+        clickClassName="tick"
+        enableDeselect
         dontClearSelection
+        tolerance={this.state.tolerance}
+        globalMouse={this.state.isGlobal}
+        allowClickWithoutSelected={false}
+        duringSelection={this.handleSelecting}
+        onSelectionClear={this.handleSelectionClear}
+        onSelectionFinish={this.handleSelectionFinish}
+        whiteList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
       >
         <List items={this.props.items} />
       </SelectableGroup>
@@ -52,7 +53,7 @@ class App extends Component {
 ```
 
 ```js
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import { createSelectable, SelectAll, DeselectAll } from 'react-selectable-fast'
 import SomeComponent from './SomeComponent'
 
@@ -88,6 +89,8 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `duringSelection` (Function) Callback fired rapidly during selection (while the selector is being dragged). Passes an array containing selectable items currently under the selector to the callback function.
 * `onSelectionFinish` (Function) Callback.
 * `onSelectionClear` (Function) Callback.
+* `enableDeselect` (Boolean) Enables deselect with selectbox.
+* `mixedDeselect` (Boolean) When enabled items can be selected and deselected with selectbox at the same time, `enableDeselect` should be set to `true`.
 * `scrollContainer` (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.
 * `whiteList` (Array) Array of whitelisted selectors.
 * `clickableClassName` (String) On element with specified selector click item cotaining this element will be selected.
@@ -97,4 +100,3 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `component` (String) The component to render. Defaults to `div`.
 * `allowClickWithoutSelected` (Boolean) When disabled items can be selected by click only if there are more than 1 already selected item.
 * `fixedPosition` (Boolean) Whether the `<SelectableGroup />` container is a fixed/absolute position element or the grandchild of one.
-* `dontClearSelection` (Boolean) When enabled, makes all new selections add to the already selected items, except for selections that contain *only* previously selected items—in this case it unselects those items.

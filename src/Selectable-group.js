@@ -18,6 +18,8 @@ class SelectableGroup extends Component {
     style: PropTypes.object,
     selectionModeClass: PropTypes.string,
     onSelectionClear: PropTypes.func,
+    enableDeselect: PropTypes.bool,
+    mixedDeselect: PropTypes.bool,
 
     /**
      * Scroll container selector
@@ -53,13 +55,6 @@ class SelectableGroup extends Component {
      * @type boolean
      */
     fixedPosition: PropTypes.bool,
-
-    /**
-     * When enabled, makes all new selections add to the already selected items,
-     * except for selections that contain only previously selected items--in this case
-     * it unselects those items.
-     */
-    dontClearSelection: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -73,7 +68,6 @@ class SelectableGroup extends Component {
     duringSelection: () => {},
     onSelectionFinish: () => {},
     onSelectionClear: () => {},
-    dontClearSelection: true,
     allowClickWithoutSelected: true,
     selectionModeClass: 'in-selection-mode',
   }
@@ -263,16 +257,23 @@ class SelectableGroup extends Component {
 
   @autobind
   selectItems(selectboxBounds, { click } = {}) {
-    const { tolerance, dontClearSelection } = this.props
+    const { tolerance, enableDeselect, mixedDeselect } = this.props
     selectboxBounds.top += this.scrollContainer.scrollTop
     selectboxBounds.left += this.scrollContainer.scrollLeft
 
     for (const item of this.registry.values()) {
-      this.processItem(item, tolerance, dontClearSelection, selectboxBounds, click)
+      this.processItem(
+        item,
+        tolerance,
+        selectboxBounds,
+        click,
+        enableDeselect,
+        mixedDeselect,
+      )
     }
   }
 
-  processItem(item, tolerance, dontClearSelection, selectboxBounds, click) {
+  processItem(item, tolerance, selectboxBounds, click, enableDeselect, mixedDeselect) {
     if (this.inWhiteList(item.node)) {
       return null
     }
@@ -290,20 +291,26 @@ class SelectableGroup extends Component {
       return this.clickedItem = item
     }
 
-    if (!click && isCollided && !selecting && !selected) {
-      item.setState({ selecting: true })
-      return this.selectingItems.add(item)
+    if (!click && isCollided) {
+      if (selected && enableDeselect && (!this.selectionStarted || mixedDeselect)) {
+        item.setState({ selected: false })
+        item.deselected = true
+        this.deselectionStarted = true
+        return this.selectedItems.delete(item)
+      }
+
+      const canSelect = mixedDeselect ? !item.deselected : !this.deselectionStarted
+      if (!selecting && !selected && canSelect) {
+        item.setState({ selecting: true })
+        this.selectionStarted = true
+        return this.selectingItems.add(item)
+      }
     }
 
     if (!click && !isCollided && selecting) {
       if (this.selectingItems.has(item)) {
         item.setState({ selecting: false })
-        this.selectingItems.delete(item)
-      } else {
-        if (!dontClearSelection) {
-          item.setState({ selecting: false })
-          this.selectedItems.delete(item)
-        }
+        return this.selectingItems.delete(item)
       }
     }
 
@@ -449,6 +456,7 @@ class SelectableGroup extends Component {
     }
 
     this.toggleSelectionMode()
+    this.cleanUp()
   }
 
   handleClick(e, top, left) {
@@ -482,6 +490,16 @@ class SelectableGroup extends Component {
 
     if (e.keyCode === 27) {
       this.clearSelection()
+    }
+  }
+
+  cleanUp() {
+    this.deselectionStarted = false
+    this.selectionStarted = false
+    if (this.props.mixedDeselect) {
+      for (const item of this.registry.values()) {
+        item.deselected = false
+      }
     }
   }
 
