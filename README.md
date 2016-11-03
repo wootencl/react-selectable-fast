@@ -52,24 +52,20 @@ class App extends Component {
 ```
 
 ```js
-import React, { Component } from 'react'
-import { createSelectable } from '../src'
+import React from 'react'
+import { createSelectable } from 'react-selectable-fast'
 
 const SomeComponent = () => (
-  <div>
-    Important info
-  </div>
+  <div>...</div>
 )
 
-export default createSelectable(Album)
+export default createSelectable(SomeComponent)
 ```
 
 ```js
 import React from 'react'
 import { SelectAll, DeselectAll } from 'react-selectable-fast'
-import SomeComponent from './SomeComponent'
-
-const SelectableComponent = createSelectable(SomeComponent)
+import SelectableComponent from './SomeComponent'
 
 const List = () => (
   <div>
