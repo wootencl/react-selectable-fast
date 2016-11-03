@@ -15,13 +15,15 @@ class SelectAllButton extends Component {
   }
 
   componentDidMount() {
-    this.refs.root.addEventListener('mousedown', (e) => e.stopPropagation())
+    this.root.addEventListener('mousedown', e => e.stopPropagation())
   }
+
+  getRootRef = c => this.root = c
 
   render() {
     return (
       <this.props.component
-        ref="root"
+        ref={this.getRootRef}
         className={`selectable-select-all ${this.props.className}`}
         onClick={this.context.selectable.selectAll}
       >

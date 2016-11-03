@@ -1,20 +1,20 @@
 import 'babel-polyfill'
 import React, { Component, PropTypes } from 'react'
-import autobind from 'autobind-decorator'
 import isNodeInRoot from './nodeInRoot'
 import getBoundsForNode from './getBoundsForNode'
 import doObjectsCollide from './doObjectsCollide'
 import Selectbox from './Selectbox'
 
+const noop = () => {}
+
 class SelectableGroup extends Component {
   static propTypes = {
     scale: PropTypes.number,
     globalMouse: PropTypes.bool,
-    whiteList: PropTypes.array,
+    ignoreList: PropTypes.array,
     scrollSpeed: PropTypes.number,
     minimumSpeedFactor: PropTypes.number,
     allowClickWithoutSelected: PropTypes.bool,
-    clickableClassName: PropTypes.string,
     style: PropTypes.object,
     selectionModeClass: PropTypes.string,
     onSelectionClear: PropTypes.func,
@@ -61,13 +61,13 @@ class SelectableGroup extends Component {
     component: 'div',
     tolerance: 0,
     globalMouse: false,
-    whiteList: [],
+    ignoreList: [],
     scale: 1,
     scrollSpeed: 0.25,
     minimumSpeedFactor: 60,
-    duringSelection: () => {},
-    onSelectionFinish: () => {},
-    onSelectionClear: () => {},
+    duringSelection: noop,
+    onSelectionFinish: noop,
+    onSelectionClear: noop,
     allowClickWithoutSelected: true,
     selectionModeClass: 'in-selection-mode',
   }
@@ -88,9 +88,11 @@ class SelectableGroup extends Component {
     this.registry = new Set()
     this.selectedItems = new Set()
     this.selectingItems = new Set()
-    this.whiteList = this.props.whiteList.concat(
-      ['.selectable-select-all', '.selectable-deselect-all']
-    )
+    this.ignoreCheckCache = new Map()
+    this.ignoreList = this.props.ignoreList.concat([
+      '.selectable-select-all',
+      '.selectable-deselect-all',
+    ])
   }
 
   getChildContext() {
@@ -106,13 +108,15 @@ class SelectableGroup extends Component {
   }
 
   componentDidMount() {
-    this.rootNode = this.refs.selectableGroup
+    this.resizeInProgress = false
+    this.rootNode = this.selectableGroup
     this.scrollContainer = document.querySelector(this.props.scrollContainer) || this.rootNode
     this.initialRootBounds = this.rootNode.getBoundingClientRect()
     this.rootNode.addEventListener('mousedown', this.mouseDown)
     this.rootNode.addEventListener('touchstart', this.mouseDown)
     document.addEventListener('keydown', this.keyListener)
     document.addEventListener('keyup', this.keyListener)
+    this.isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
   }
 
   componentWillUnmount() {
@@ -122,39 +126,33 @@ class SelectableGroup extends Component {
     document.removeEventListener('keyup', this.keyListener)
   }
 
-  @autobind
-  applyScale(top, left) {
-    return {
-      scaledTop: top / this.props.scale,
-      scaledLeft: left / this.props.scale,
-    }
-  }
+  applyScale = (top, left) => ({
+    scaledTop: top / this.props.scale,
+    scaledLeft: left / this.props.scale,
+  })
 
-  @autobind
-  setScollTop(e) {
+  setScollTop = e => {
     const scrollTop = this.scrollContainer.scrollTop
     this.checkScrollUp(e, scrollTop)
     this.checkScrollDown(e, scrollTop)
   }
 
-  @autobind
-  checkScrollUp(e, currentTop) {
+  checkScrollUp = (e, currentTop) => {
     const { minimumSpeedFactor, scrollSpeed } = this.props
     const offset = this.scrollBounds.top - e.clientY
 
     if (offset > 0 || e.clientY < 0) {
-      const newTop = currentTop - (Math.max(offset, minimumSpeedFactor)) * scrollSpeed
+      const newTop = currentTop - ((Math.max(offset, minimumSpeedFactor)) * scrollSpeed)
       this.scrollContainer.scrollTop = newTop
     }
   }
 
-  @autobind
-  checkScrollDown(e, currentTop) {
+  checkScrollDown = (e, currentTop) => {
     const { minimumSpeedFactor, scrollSpeed } = this.props
     const offset = e.clientY - this.scrollBounds.bottom
 
     if (offset > 0 || e.clientY > window.innerHeight) {
-      const newTop = currentTop + (Math.max(offset, minimumSpeedFactor)) * scrollSpeed
+      const newTop = currentTop + ((Math.max(offset, minimumSpeedFactor)) * scrollSpeed)
       this.scrollContainer.scrollTop = Math.min(newTop, this.maxScroll)
     }
   }
@@ -167,8 +165,7 @@ class SelectableGroup extends Component {
     this.maxScroll = this.scrollContainer.scrollHeight - this.scrollContainer.clientHeight
   }
 
-  @autobind
-  updateRegistry() {
+  updateRegistry = () => {
     const containerScroll = {
       scrollTop: this.scrollContainer.scrollTop,
       scrollLeft: this.scrollContainer.scrollLeft,
@@ -179,13 +176,11 @@ class SelectableGroup extends Component {
     }
   }
 
-  @autobind
-  registerSelectable(selectableItem) {
+  registerSelectable = selectableItem => {
     this.registry.add(selectableItem)
   }
 
-  @autobind
-  unregisterSelectable(selectableItem) {
+  unregisterSelectable = selectableItem => {
     this.registry.delete(selectableItem)
   }
 
@@ -200,8 +195,9 @@ class SelectableGroup extends Component {
     }
   }
 
-  @autobind
-  openSelectbox(event) {
+  applyContainerScroll = (value, scroll) => value + (scroll / this.props.scale)
+
+  openSelectbox = event => {
     const e = this.desktopEventCoords(event)
     this.setScollTop(e)
 
@@ -209,34 +205,41 @@ class SelectableGroup extends Component {
     this.mouseMoveStarted = true
 
     const scrollTop = this.scrollContainer.scrollTop
-    const applyContainerScroll = (value, scroll) => value + scroll / this.props.scale
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
 
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
-    const windowTopScroll = isChrome ? window.scrollY : document.documentElement.scrollTop
-    const windowLeftScroll = isChrome ? window.scrollX : document.documentElement.scrollLeft
+    const windowTopScroll = this.isChrome ? window.scrollY : document.documentElement.scrollTop
+    const windowLeftScroll = this.isChrome ? window.scrollX : document.documentElement.scrollLeft
 
-    const top = applyContainerScroll(scaledTop - this.scrollBounds.top, scrollTop - windowTopScroll)
-    let boxTop = applyContainerScroll(
+    const top = this.applyContainerScroll(
+      scaledTop - this.scrollBounds.top,
+      scrollTop - windowTopScroll,
+    )
+
+    let boxTop = this.applyContainerScroll(
       this.mouseDownData.boxTop - this.scrollBounds.top,
-      this.mouseDownData.scrollTop - windowTopScroll
+      this.mouseDownData.scrollTop - windowTopScroll,
     )
-    const h = boxTop - top
-    boxTop = Math.min(boxTop - h, boxTop)
-    const w = this.mouseDownData.boxLeft - scaledLeft
+
+    const boxHeight = boxTop - top
+    boxTop = Math.min(boxTop - boxHeight, boxTop)
+
+    const bowWidth = this.mouseDownData.boxLeft - scaledLeft
     const leftContainerRelative = this.mouseDownData.boxLeft - this.scrollBounds.left
-    const boxLeft = applyContainerScroll(
+
+    const boxLeft = this.applyContainerScroll(
       Math.min(
-        leftContainerRelative - w / this.props.scale, leftContainerRelative / this.props.scale
-      ), -windowLeftScroll
+        leftContainerRelative - (bowWidth / this.props.scale),
+        leftContainerRelative / this.props.scale,
+      ),
+      -windowLeftScroll
     )
 
-    this.updatedSelecting()
+    this.updateSelecting()
 
-    this.refs.selectbox.setState({
+    this.selectbox.setState({
       isBoxSelecting: true,
-      boxWidth: Math.abs(w),
-      boxHeight: Math.abs(h),
+      boxWidth: Math.abs(bowWidth),
+      boxHeight: Math.abs(boxHeight),
       boxLeft,
       boxTop,
     }, () => {
@@ -246,17 +249,15 @@ class SelectableGroup extends Component {
     this.props.duringSelection([...this.selectingItems])
   }
 
-  @autobind
-  updatedSelecting() {
-    const selectbox = this.refs.selectbox.getRef()
+  updateSelecting = () => {
+    const selectbox = this.selectbox.getRef()
     if (!selectbox) return
 
     const selectboxBounds = getBoundsForNode(selectbox)
     this.selectItems(selectboxBounds)
   }
 
-  @autobind
-  selectItems(selectboxBounds, { click } = {}) {
+  selectItems = (selectboxBounds, { click } = {}) => {
     const { tolerance, enableDeselect, mixedDeselect } = this.props
     selectboxBounds.top += this.scrollContainer.scrollTop
     selectboxBounds.left += this.scrollContainer.scrollLeft
@@ -274,7 +275,7 @@ class SelectableGroup extends Component {
   }
 
   processItem(item, tolerance, selectboxBounds, click, enableDeselect, mixedDeselect) {
-    if (this.inWhiteList(item.node)) {
+    if (this.inIgnoreList(item.node)) {
       return null
     }
 
@@ -317,8 +318,7 @@ class SelectableGroup extends Component {
     return null
   }
 
-  @autobind
-  clearSelection() {
+  clearSelection = () => {
     for (const item of this.selectedItems.values()) {
       item.setState({ selected: false })
       this.selectedItems.delete(item)
@@ -328,11 +328,10 @@ class SelectableGroup extends Component {
     this.props.onSelectionClear()
   }
 
-  @autobind
-  selectAll() {
+  selectAll = () => {
     this.updateWhiteListNodes()
     for (const item of this.registry.values()) {
-      if (!this.inWhiteList(item.node) && !item.state.selected) {
+      if (!this.inIgnoreList(item.node) && !item.state.selected) {
         item.setState({ selected: true })
         this.selectedItems.add(item)
       }
@@ -341,30 +340,35 @@ class SelectableGroup extends Component {
     this.props.onSelectionFinish([...this.selectedItems])
   }
 
-  inWhiteList(target) {
-    return [...this.whiteListNodes].some(node => (
+  inIgnoreList(target) {
+    if (this.ignoreCheckCache.get(target) !== undefined) {
+      return this.ignoreCheckCache.get(target)
+    }
+
+    const shouldBeIgnored = this.ignoreListNodes.some(node => (
       target === node || node.contains(target)
     ))
+    this.ignoreCheckCache.set(target, shouldBeIgnored)
+    return shouldBeIgnored
   }
 
   updateWhiteListNodes() {
-    this.whiteListNodes = document.querySelectorAll(this.whiteList.join(', '))
+    this.ignoreListNodes = [...document.querySelectorAll(this.ignoreList.join(', '))]
   }
 
-  @autobind
-  mouseDown(e) {
+  mouseDown = e => {
     if (this.mouseDownStarted) return
     this.mouseDownStarted = true
     this.mouseUpStarted = false
     e = this.desktopEventCoords(e)
 
     this.updateWhiteListNodes()
-    if (this.inWhiteList(e.target)) {
+    if (this.inIgnoreList(e.target)) {
       this.mouseDownStarted = false
       return
     }
 
-    const node = this.refs.selectableGroup
+    const node = this.selectableGroup
     if (!this.props.globalMouse && !isNodeInRoot(e.target, node)) {
       const offsetData = getBoundsForNode(node)
       const collides = doObjectsCollide(
@@ -406,7 +410,7 @@ class SelectableGroup extends Component {
   }
 
   preventEvent(target, type) {
-    const preventHandler = (e) => {
+    const preventHandler = e => {
       target.removeEventListener(type, preventHandler, true)
       e.preventDefault()
       e.stopPropagation()
@@ -414,8 +418,7 @@ class SelectableGroup extends Component {
     target.addEventListener(type, preventHandler, true)
   }
 
-  @autobind
-  mouseUp(event) {
+  mouseUp = event => {
     if (this.mouseUpStarted) return
 
     this.mouseUpStarted = true
@@ -447,7 +450,7 @@ class SelectableGroup extends Component {
         this.preventEvent(e.target, 'click')
       }
 
-      this.refs.selectbox.setState({
+      this.selectbox.setState({
         isBoxSelecting: false,
         boxWidth: 0,
         boxHeight: 0,
@@ -481,9 +484,9 @@ class SelectableGroup extends Component {
     }
   }
 
-  @autobind
-  keyListener(e) {
+  keyListener = e => {
     this.ctrlPressed = e.ctrlKey || e.metaKey
+
     if (this.ctrlPressed) {
       return
     }
@@ -526,16 +529,22 @@ class SelectableGroup extends Component {
     return e
   }
 
+  getGroupRef = c => this.selectableGroup = c
+  getSelectboxRef = c => this.selectbox = c
+
   render() {
     return (
       <this.props.component
-        ref="selectableGroup"
+        ref={this.getGroupRef}
         style={this.props.style}
         className={
           `${this.props.className} ${this.state.selectionMode ? this.props.selectionModeClass : ''}`
         }
       >
-        <Selectbox fixedPosition={this.props.fixedPosition} ref="selectbox" />
+        <Selectbox
+          ref={this.getSelectboxRef}
+          fixedPosition={this.props.fixedPosition}
+        />
         {this.props.children}
       </this.props.component>
     )

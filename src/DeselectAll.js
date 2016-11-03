@@ -15,15 +15,17 @@ class DeselectAllButton extends Component {
   }
 
   componentDidMount() {
-    this.refs.root.addEventListener('mousedown', (e) => e.stopPropagation())
+    this.root.addEventListener('mousedown', e => e.stopPropagation())
   }
+
+  getRootRef = c => this.root = c
 
   render() {
     return (
       <this.props.component
-        ref="root"
-        className={`selectable-deselect-all ${this.props.className}`}
+        ref={this.getRootRef}
         onClick={this.context.selectable.clearSelection}
+        className={`selectable-deselect-all ${this.props.className}`}
       >
         {this.props.children}
       </this.props.component>

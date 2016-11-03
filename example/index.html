@@ -69,7 +69,7 @@ To make other components selectable create selectable component with <code>creat
         duringSelection<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelecting</span>}
         onSelectionClear<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionClear</span>}
         onSelectionFinish<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">handleSelectionFinish</span>}
-        whiteList<span class="pl-k">=</span>{[<span class="pl-s"><span class="pl-pds">'</span>.not-selectable<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.item:nth-child(10)<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.item:nth-child(27)<span class="pl-pds">'</span></span>]}
+        ignoreList<span class="pl-k">=</span>{[<span class="pl-s"><span class="pl-pds">'</span>.not-selectable<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.item:nth-child(10)<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>.item:nth-child(27)<span class="pl-pds">'</span></span>]}
       <span class="pl-k">&gt;</span>
         <span class="pl-k">&lt;</span>List items<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-smi">props</span>.<span class="pl-smi">items</span>} <span class="pl-k">/</span><span class="pl-k">&gt;</span>
       <span class="pl-k">&lt;</span><span class="pl-k">/</span>SelectableGroup<span class="pl-k">&gt;</span>
@@ -113,7 +113,7 @@ To make other components selectable create selectable component with <code>creat
         <li><code>enableDeselect</code> (Boolean) Enables deselect with selectbox.</li>
         <li><code>mixedDeselect</code> (Boolean) When enabled items can be selected and deselected with selectbox at the same time, <code>enableDeselect</code> should be set to <code>true</code>.</li>
         <li><code>scrollContainer</code> (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.</li>
-        <li><code>whiteList</code> (Array) Array of whitelisted selectors.</li>
+        <li><code>ignoreList</code> (Array) Array of ignored selectors.</li>
         <li><code>clickableClassName</code> (String) On element with specified selector click item cotaining this element will be selected.</li>
         <li><code>tolerance</code> (Number) The amount of buffer to add around your <code>&lt;SelectableGroup /&gt;</code> container, in pixels.</li>
         <li><code>className</code> (String) Class of selectable group element.</li>

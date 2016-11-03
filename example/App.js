@@ -1,26 +1,19 @@
 import React, { Component } from 'react'
-import autobind from 'autobind-decorator'
 import { SelectableGroup } from '../src'
 import List from './List'
 
 class App extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      selectedItems: [],
-      selectingItems: [],
-      tolerance: 0,
-    }
+  state = {
+    selectedItems: [],
+    selectingItems: [],
+    tolerance: 0,
   }
 
-  @autobind
-  handleSelecting(selectingItems) {
+  handleSelecting = selectingItems => {
     this.setState({ selectingItems })
   }
 
-  @autobind
-  handleSelectionFinish(selectedItems) {
+  handleSelectionFinish = selectedItems => {
     this.setState({
       selectedItems,
       selectingItems: [],
@@ -33,24 +26,26 @@ class App extends Component {
   }
 
   render() {
+    const { selectedItems, selectingItems, tolerance, isGlobal } = this.state
+
     return (
       <div>
         <p>
-          Selecting: <span className="counter">{this.state.selectingItems.length}</span>
+          Selecting: <span className="counter">{selectingItems.length}</span>
           <br />
-          Selected: <span className="counter">{this.state.selectedItems.length}</span>
+          Selected: <span className="counter">{selectedItems.length}</span>
         </p>
         <SelectableGroup
           className="main"
           clickClassName="tick"
           enableDeselect
-          tolerance={this.state.tolerance}
-          globalMouse={this.state.isGlobal}
+          tolerance={tolerance}
+          globalMouse={isGlobal}
           allowClickWithoutSelected={false}
           duringSelection={this.handleSelecting}
           onSelectionClear={this.handleSelectionClear}
           onSelectionFinish={this.handleSelectionFinish}
-          whiteList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
+          ignoreList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
         >
           <List items={this.props.items} />
         </SelectableGroup>

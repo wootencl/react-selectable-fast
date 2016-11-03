@@ -19,11 +19,11 @@ const coordsCollide = (aTop, aLeft, bTop, bLeft, aWidth, aHeight, bWidth, bHeigh
 
   return !(
       // 'a' bottom doesn't touch 'b' top
-        ((aTop + aHeight - tolerance) < bTop) ||
+        (((aTop + aHeight) - tolerance) < bTop) ||
         // 'a' top doesn't touch 'b' bottom
         ((aTop + tolerance) > (bTop + bHeight)) ||
         // 'a' right doesn't touch 'b' left
-        ((aLeft + aWidth - tolerance) < bLeft) ||
+        (((aLeft + aWidth) - tolerance) < bLeft) ||
         // 'a' left doesn't touch 'b' right
         ((aLeft + tolerance) > (bLeft + bWidth))
     )

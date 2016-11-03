@@ -1,8 +1,6 @@
-import React, { Component, PropTypes } from 'react'
-import { createSelectable, SelectAll, DeselectAll } from '../src'
-import Album from './Album'
-
-const SelectableAlbum = createSelectable(Album)
+import React, { Component } from 'react'
+import { SelectAll, DeselectAll } from '../src'
+import SelectableAlbum from './Album'
 
 class List extends Component {
   shouldComponentUpdate(nextProps) {
@@ -24,7 +22,7 @@ class List extends Component {
         <div className="albums">
           {this.props.items.map((item, i) => (
             <SelectableAlbum
-              key={i}
+              key={`${item.title}${i}`}
               title={item.title}
               year={item.year}
             />

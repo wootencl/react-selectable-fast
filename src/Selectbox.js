@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react'
-import autobind from 'autobind-decorator'
 
 class Selectbox extends Component {
   static propTypes = {
@@ -11,22 +10,17 @@ class Selectbox extends Component {
     className: 'selectable-selectbox',
   }
 
-  constructor() {
-    super()
-
-    this.state = {
-      isBoxSelecting: false,
-      left: 0,
-      top: 0,
-      boxWidth: 0,
-      boxHeight: 0,
-    }
+  state = {
+    top: 0,
+    left: 0,
+    boxWidth: 0,
+    boxHeight: 0,
+    isBoxSelecting: false,
   }
 
-  @autobind
-  getRef() {
-    return this.refs.selectbox
-  }
+  getRef = () => this.selectbox
+
+  getSelectboxRef = c => this.selectbox = c
 
   render() {
     const boxStyle = {
@@ -43,7 +37,11 @@ class Selectbox extends Component {
       <div>
         {
           this.state.isBoxSelecting &&
-          <div style={boxStyle} className={this.props.className} ref="selectbox"></div>
+          <div
+            ref={this.getSelectboxRef}
+            style={boxStyle}
+            className={this.props.className}
+          />
         }
       </div>
     )

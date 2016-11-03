@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
-import autobind from 'autobind-decorator'
 import getBoundsForNode from './getBoundsForNode'
 
-const createSelectable = (WrappedComponent) => {
+const createSelectable = WrappedComponent => {
   class SelectableItem extends Component {
     static propTypes = {
       children: PropTypes.array,
@@ -23,7 +22,7 @@ const createSelectable = (WrappedComponent) => {
     }
 
     componentDidMount() {
-      this.node = ReactDOM.findDOMNode(this)
+      this.node = ReactDOM.findDOMNode(this) // eslint-disable-line
       this.registerSelectable()
     }
 
@@ -31,17 +30,17 @@ const createSelectable = (WrappedComponent) => {
       this.context.selectable.unregister(this.props.selectableKey)
     }
 
-    @autobind
-    registerSelectable(containerScroll) {
+    registerSelectable = containerScroll => {
       this.bounds = getBoundsForNode(this.node, containerScroll)
       this.context.selectable.register(this)
     }
 
     render() {
-      const props = Object.assign({}, this.props, {
+      const props = {
+        ...this.props,
         selected: this.state.selected,
         selecting: this.state.selecting,
-      })
+      }
 
       return React.createElement(
         WrappedComponent,

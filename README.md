@@ -20,8 +20,8 @@ Main idea of this fork is to eliminate render during selection caused by state u
 
 ## Usage
 
-Package exports 4 components `{ SelectableGroup, createSelectable, SelectAll, DeselectAll }`.
-To make other components selectable create selectable component with `createSelectable` function and put a list of them under `SelectableGroup`.
+Package exports 4 entities `{ SelectableGroup, createSelectable, SelectAll, DeselectAll }`.
+To make other components selectable wrap them using HoF `createSelectable` and put a list of them under `SelectableGroup`.
 
 ```js
 import React, { Component } from 'react'
@@ -42,7 +42,7 @@ class App extends Component {
         duringSelection={this.handleSelecting}
         onSelectionClear={this.handleSelectionClear}
         onSelectionFinish={this.handleSelectionFinish}
-        whiteList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
+        ignoreList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
       >
         <List items={this.props.items} />
       </SelectableGroup>
@@ -53,34 +53,41 @@ class App extends Component {
 
 ```js
 import React, { Component } from 'react'
-import { createSelectable, SelectAll, DeselectAll } from 'react-selectable-fast'
+import { createSelectable } from '../src'
+
+const SomeComponent = () => (
+  <div>
+    Important info
+  </div>
+)
+
+export default createSelectable(Album)
+```
+
+```js
+import React from 'react'
+import { SelectAll, DeselectAll } from 'react-selectable-fast'
 import SomeComponent from './SomeComponent'
 
 const SelectableComponent = createSelectable(SomeComponent)
 
-class List extends Component {
-  ...
-
-  render() {
-    return (
-      <div>
-        <SelectAll className="selectable-button">
-          <button>Select all</button>
-        </SelectAll>
-        <DeselectAll className="selectable-button">
-          <button>Clear selection</button>
-        </DeselectAll>
-        {this.props.items.map((item, i) => (
-          <SelectableComponent
-            key={i}
-            title={item.title}
-            year={item.year}
-          />
-        ))}
-      </div>
-    )
-  }
-}
+const List = () => (
+  <div>
+    <SelectAll className="selectable-button">
+      <button>Select all</button>
+    </SelectAll>
+    <DeselectAll className="selectable-button">
+      <button>Clear selection</button>
+    </DeselectAll>
+    {this.props.items.map((item, i) => (
+      <SelectableComponent
+        key={i}
+        title={item.title}
+        year={item.year}
+      />
+    ))}
+  </div>
+)
 ```
 ## Configuration
 
@@ -91,7 +98,7 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `enableDeselect` (Boolean) Enables deselect with selectbox.
 * `mixedDeselect` (Boolean) When enabled items can be selected and deselected with selectbox at the same time, `enableDeselect` should be set to `true`.
 * `scrollContainer` (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.
-* `whiteList` (Array) Array of whitelisted selectors.
+* `ignoreList` (Array) Array of ignored selectors.
 * `clickableClassName` (String) On element with specified selector click item cotaining this element will be selected.
 * `tolerance` (Number) The amount of buffer to add around your `<SelectableGroup />` container, in pixels.
 * `className` (String) Class of selectable group element.

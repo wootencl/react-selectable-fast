@@ -1,5 +1,6 @@
 import React from 'react'
-import Label from './Label.js'
+import { createSelectable } from '../src'
+import Label from './Label'
 
 const Album = ({ selected, selecting, title, year }) => (
   <div className={`item ${selecting && 'selecting'} ${selected && 'selected'}`}>
@@ -10,4 +11,4 @@ const Album = ({ selected, selecting, title, year }) => (
   </div>
 )
 
-export default Album
+export default createSelectable(Album)
