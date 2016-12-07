@@ -124,6 +124,14 @@ class SelectableGroup extends Component {
     this.rootNode.removeEventListener('touchstart', this.mouseDown)
     document.removeEventListener('keydown', this.keyListener)
     document.removeEventListener('keyup', this.keyListener)
+    this.removeTempEventListeners()
+  }
+
+  removeTempEventListeners() {
+    document.removeEventListener('mousemove', this.openSelectbox)
+    document.removeEventListener('touchmove', this.openSelectbox)
+    document.removeEventListener('mouseup', this.mouseUp)
+    document.removeEventListener('touchend', this.mouseUp)
   }
 
   applyScale = (top, left) => ({
@@ -423,11 +431,7 @@ class SelectableGroup extends Component {
 
     this.mouseUpStarted = true
     this.mouseDownStarted = false
-
-    document.removeEventListener('mousemove', this.openSelectbox)
-    document.removeEventListener('touchmove', this.openSelectbox)
-    document.removeEventListener('mouseup', this.mouseUp)
-    document.removeEventListener('touchend', this.mouseUp)
+    this.removeTempEventListeners()
 
     if (!this.mouseDownData) return
 
