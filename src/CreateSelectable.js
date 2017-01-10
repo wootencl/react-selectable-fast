@@ -1,14 +1,9 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import getBoundsForNode from './getBoundsForNode'
 
 const createSelectable = WrappedComponent => {
   class SelectableItem extends Component {
-    static propTypes = {
-      children: PropTypes.array,
-      selectableKey: PropTypes.any,
-    }
-
     static contextTypes = {
       selectable: React.PropTypes.object,
     }
@@ -27,7 +22,7 @@ const createSelectable = WrappedComponent => {
     }
 
     componentWillUnmount() {
-      this.context.selectable.unregister(this.props.selectableKey)
+      this.context.selectable.unregister(this)
     }
 
     registerSelectable = containerScroll => {
