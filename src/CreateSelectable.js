@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
 import getBoundsForNode from './getBoundsForNode'
 
@@ -8,10 +8,18 @@ const createSelectable = WrappedComponent => {
       selectable: React.PropTypes.object,
     }
 
-    constructor() {
-      super()
+    static propTypes = {
+      selected: PropTypes.bool,
+    }
+
+    static defaultProps = {
+      selected: false,
+    }
+
+    constructor(props) {
+      super(props)
       this.state = {
-        selected: false,
+        selected: props.selected,
         selecting: false,
       }
     }
