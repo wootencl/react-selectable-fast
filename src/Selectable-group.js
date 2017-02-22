@@ -186,6 +186,9 @@ class SelectableGroup extends Component {
 
   registerSelectable = selectableItem => {
     this.registry.add(selectableItem)
+    if (selectableItem.props.selected) {
+      this.selectedItems.add(selectableItem)
+    }
   }
 
   unregisterSelectable = selectableItem => {
