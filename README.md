@@ -16,7 +16,7 @@ npm i -S react-selectable-fast
 
 ## Based on react-selectable
 This project is based on [react-selectable](https://github.com/unclecheese/react-selectable) by [unclecheese](https://github.com/unclecheese).
-Main idea of this fork is to eliminate render during selection caused by state updates of SelectableGroup. Only items under selectbox rerender themself, which great for big lists of selectable items. Also this package extends the original functionality with ability to scroll items while selecting relative to window and specified scroll container.
+The main idea of this fork is to eliminate render during selection caused by state updates of SelectableGroup. Only items under selectbox rerender themselves, which great for big lists of selectable items. Also, this package extends the original functionality with ability to scroll items while selecting relative to window and specified scroll container.
 
 ## Usage
 
@@ -95,10 +95,10 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `mixedDeselect` (Boolean) When enabled items can be selected and deselected with selectbox at the same time, `enableDeselect` should be set to `true`.
 * `scrollContainer` (String) Selector of scroll container which will be used to calculate selectbox position. If not specified SelectableGroup element will be used as scroll container.
 * `ignoreList` (Array) Array of ignored selectors.
-* `clickableClassName` (String) On element with specified selector click item cotaining this element will be selected.
+* `clickableClassName` (String) On elements with specified selector click item containing this element will be selected.
 * `tolerance` (Number) The amount of buffer to add around your `<SelectableGroup />` container, in pixels.
 * `className` (String) Class of selectable group element.
-* `selectionModeClass` (String) Class indicating that there are more than 1 selected item. Defaults to 'in-selection-mode'.
+* `selectionModeClass` (String) Class indicating that there is more than 1 selected item. Defaults to 'in-selection-mode'.
 * `component` (String) The component to render. Defaults to `div`.
-* `allowClickWithoutSelected` (Boolean) When disabled items can be selected by click only if there are more than 1 already selected item.
-* `fixedPosition` (Boolean) Whether the `<SelectableGroup />` container is a fixed/absolute position element or the grandchild of one.
+* `allowClickWithoutSelected` (Boolean) When disabled items can be selected by click only if there is more than 1 already selected item.
+* `fixedPosition` (Boolean) Whether the `<SelectableGroup />` container is a fixed or absolutely positioned element or the grandchild of one.
