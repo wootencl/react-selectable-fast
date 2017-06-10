@@ -1,31 +1,27 @@
-import React, { Component, PropTypes } from 'react'
-import ReactDOM from 'react-dom'
+import React, { Component } from 'react'
+import { object, bool } from 'prop-types'
 import getBoundsForNode from './getBoundsForNode'
 
-const createSelectable = WrappedComponent => {
+const createSelectable = WrappedComponent => (
   class SelectableItem extends Component {
-    static contextTypes = {
-      selectable: React.PropTypes.object,
-    }
-
     static propTypes = {
-      selected: PropTypes.bool,
+      selected: bool,
     }
 
     static defaultProps = {
       selected: false,
     }
 
-    constructor(props) {
-      super(props)
-      this.state = {
-        selected: props.selected,
-        selecting: false,
-      }
+    static contextTypes = {
+      selectable: object,
+    }
+
+    state = {
+      selected: this.props.selected,
+      selecting: false,
     }
 
     componentDidMount() {
-      this.node = ReactDOM.findDOMNode(this) // eslint-disable-line
       this.registerSelectable()
     }
 
@@ -38,22 +34,19 @@ const createSelectable = WrappedComponent => {
       this.context.selectable.register(this)
     }
 
-    render() {
-      const props = {
-        ...this.props,
-        selected: this.state.selected,
-        selecting: this.state.selecting,
-      }
+    selectableRef = ref => this.node = ref
 
-      return React.createElement(
-        WrappedComponent,
-        props,
-        this.props.children
+    render() {
+      return (
+        <WrappedComponent
+          {...this.props}
+          selected={this.state.selected}
+          selecting={this.state.selecting}
+          selectableRef={this.selectableRef}
+        />
       )
     }
   }
-
-  return SelectableItem
-}
+)
 
 export default createSelectable

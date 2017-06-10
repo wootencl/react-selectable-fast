@@ -1,26 +1,28 @@
 const path = require('path')
 
 module.exports = {
+  devServer: {
+    host: '0.0.0.0',
+    disableHostCheck: true,
+  },
   devtool: 'eval',
-  debug: true,
-  entry: './example/example.js',
+  entry: path.resolve(__dirname, 'example.js'),
   output: {
-    path: './example',
+    path: path.resolve(__dirname, 'example'),
     publicPath: '',
-    filename: 'bundle.js'
+    filename: 'bundle.js',
   },
 
   module: {
     loaders: [
       {
         test: /\.js$/,
-        loader: 'babel-loader'
-      }
-    ]
+        loader: 'babel-loader',
+      },
+    ],
   },
 
   resolve: {
-    root: path.resolve(__dirname),
-    modulesDirectories: ['node_modules', 'dist']
-  }
+    modules: ['node_modules', 'dist'],
+  },
 }

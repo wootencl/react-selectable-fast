@@ -49,6 +49,6 @@ export default (a, b, tolerance) => {
     aObj.offsetHeight,
     bObj.offsetWidth,
     bObj.offsetHeight,
-    tolerance
+    tolerance,
   )
 }

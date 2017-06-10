@@ -1,5 +1,11 @@
-import 'babel-polyfill'
-import React, { Component, PropTypes } from 'react'
+import 'core-js/fn/object/assign'
+import 'core-js/fn/array/from'
+import 'core-js/fn/array/is-array'
+import 'core-js/fn/map'
+import 'core-js/fn/set'
+
+import React, { Component } from 'react'
+import { number, bool, array, string, func, node, object } from 'prop-types'
 import isNodeInRoot from './nodeInRoot'
 import getBoundsForNode from './getBoundsForNode'
 import doObjectsCollide from './doObjectsCollide'
@@ -9,52 +15,52 @@ const noop = () => {}
 
 class SelectableGroup extends Component {
   static propTypes = {
-    scale: PropTypes.number,
-    globalMouse: PropTypes.bool,
-    ignoreList: PropTypes.array,
-    scrollSpeed: PropTypes.number,
-    minimumSpeedFactor: PropTypes.number,
-    allowClickWithoutSelected: PropTypes.bool,
-    style: PropTypes.object,
-    selectionModeClass: PropTypes.string,
-    onSelectionClear: PropTypes.func,
-    enableDeselect: PropTypes.bool,
-    mixedDeselect: PropTypes.bool,
+    scale: number,
+    globalMouse: bool,
+    ignoreList: array,
+    scrollSpeed: number,
+    minimumSpeedFactor: number,
+    allowClickWithoutSelected: bool,
+    style: object,
+    selectionModeClass: string,
+    onSelectionClear: func,
+    enableDeselect: bool,
+    mixedDeselect: bool,
 
     /**
      * Scroll container selector
      */
-    scrollContainer: PropTypes.string,
+    scrollContainer: string,
 
     /**
      * Event that will fire rapidly during selection (while the selector is
      * being dragged). Passes an array of keys.
      */
-    duringSelection: PropTypes.func,
+    duringSelection: func,
 
     /**
      * Event that will fire when items are selected. Passes an array of keys.
      */
-    onSelectionFinish: PropTypes.func,
+    onSelectionFinish: func,
 
     /**
      * The component that will represent the Selectable DOM node
      */
-    component: PropTypes.node,
+    component: node,
 
     /**
      * Amount of forgiveness an item will offer to the selectbox before registering
      * a selection, i.e. if only 1px of the item is in the selection, it shouldn't be
      * included.
      */
-    tolerance: PropTypes.number,
+    tolerance: number,
 
     /**
      * In some cases, it the bounding box may need fixed positioning, if your layout
      * is relying on fixed positioned elements, for instance.
      * @type boolean
      */
-    fixedPosition: PropTypes.bool,
+    fixedPosition: bool,
   }
 
   static defaultProps = {
@@ -73,7 +79,7 @@ class SelectableGroup extends Component {
   }
 
   static childContextTypes = {
-    selectable: React.PropTypes.object,
+    selectable: object,
   }
 
   constructor(props) {
@@ -117,6 +123,9 @@ class SelectableGroup extends Component {
     document.addEventListener('keydown', this.keyListener)
     document.addEventListener('keyup', this.keyListener)
     this.isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
+
+    this.supportPageOffset = window.pageXOffset !== undefined
+    this.isCSS1Compat = ((document.compatMode || '') === 'CSS1Compat')
   }
 
   componentWillUnmount() {
@@ -208,18 +217,35 @@ class SelectableGroup extends Component {
 
   applyContainerScroll = (value, scroll) => value + (scroll / this.props.scale)
 
+  getWindowScroll = () => {
+    if (this.supportPageOffset) {
+      return {
+        windowTopScroll: window.pageYOffset,
+        windowLeftScroll: window.pageXOffset,
+      }
+    }
+
+    return {
+      windowTopScroll: this.isCSS1Compat
+        ? document.documentElement.scrollTop
+        : document.body.scrollTop,
+      windowLeftScroll: this.isCSS1Compat
+        ? document.documentElement.scrollLeft
+        : document.body.scrollLeft,
+    }
+  }
+
   openSelectbox = event => {
     const e = this.desktopEventCoords(event)
     this.setScollTop(e)
 
     if (this.mouseMoveStarted) return
     this.mouseMoveStarted = true
+    this.mouseMoved = true
 
     const scrollTop = this.scrollContainer.scrollTop
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
-
-    const windowTopScroll = this.isChrome ? window.scrollY : document.documentElement.scrollTop
-    const windowLeftScroll = this.isChrome ? window.scrollX : document.documentElement.scrollLeft
+    const { windowTopScroll, windowLeftScroll } = this.getWindowScroll()
 
     const top = this.applyContainerScroll(
       scaledTop - this.scrollBounds.top,
@@ -242,10 +268,8 @@ class SelectableGroup extends Component {
         leftContainerRelative - (bowWidth / this.props.scale),
         leftContainerRelative / this.props.scale,
       ),
-      -windowLeftScroll
+      -windowLeftScroll,
     )
-
-    this.updateSelecting()
 
     this.selectbox.setState({
       isBoxSelecting: true,
@@ -254,10 +278,10 @@ class SelectableGroup extends Component {
       boxLeft,
       boxTop,
     }, () => {
+      this.updateSelecting()
+      this.props.duringSelection([...this.selectingItems])
       this.mouseMoveStarted = false
     })
-
-    this.props.duringSelection([...this.selectingItems])
   }
 
   updateSelecting = () => {
@@ -265,7 +289,11 @@ class SelectableGroup extends Component {
     if (!selectbox) return
 
     const selectboxBounds = getBoundsForNode(selectbox)
-    this.selectItems(selectboxBounds)
+    this.selectItems({
+      ...selectboxBounds,
+      offsetWidth: selectboxBounds.offsetWidth || 1,
+      offsetHeight: selectboxBounds.offsetHeight || 1,
+    })
   }
 
   selectItems = (selectboxBounds, { click } = {}) => {
@@ -356,8 +384,8 @@ class SelectableGroup extends Component {
       return this.ignoreCheckCache.get(target)
     }
 
-    const shouldBeIgnored = this.ignoreListNodes.some(node => (
-      target === node || node.contains(target)
+    const shouldBeIgnored = this.ignoreListNodes.some(ignoredNode => (
+      target === ignoredNode || ignoredNode.contains(target)
     ))
     this.ignoreCheckCache.set(target, shouldBeIgnored)
     return shouldBeIgnored
@@ -379,9 +407,8 @@ class SelectableGroup extends Component {
       return
     }
 
-    const node = this.selectableGroup
-    if (!this.props.globalMouse && !isNodeInRoot(e.target, node)) {
-      const offsetData = getBoundsForNode(node)
+    if (!this.props.globalMouse && !isNodeInRoot(e.target, this.selectableGroup)) {
+      const offsetData = getBoundsForNode(this.selectableGroup)
       const collides = doObjectsCollide(
         {
           top: offsetData.top,
@@ -394,7 +421,7 @@ class SelectableGroup extends Component {
           left: e.pageX,
           offsetWidth: 0,
           offsetHeight: 0,
-        }
+        },
       )
       if (!collides) return
     }
@@ -439,12 +466,9 @@ class SelectableGroup extends Component {
     if (!this.mouseDownData) return
 
     const e = this.desktopEventCoords(event)
-
     const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
-    const { boxTop, boxLeft } = this.mouseDownData
-    const isClick = (scaledLeft === boxLeft && scaledTop === boxTop)
 
-    if (isClick && isNodeInRoot(e.target, this.rootNode)) {
+    if (!this.mouseMoved && isNodeInRoot(e.target, this.rootNode)) {
       this.handleClick(e, scaledTop, scaledLeft)
     } else {
       for (const item of this.selectingItems.values()) {
@@ -467,6 +491,7 @@ class SelectableGroup extends Component {
 
     this.toggleSelectionMode()
     this.cleanUp()
+    this.mouseMoved = false
   }
 
   handleClick(e, top, left) {

@@ -3,7 +3,10 @@
  * @param  {HTMLElement} node
  * @return {Object}
  */
-export default (node, containerScroll = { scrollTop: 0, scrollLeft: 0 }) => {
+export default function getBoundsForNode(
+  node,
+  containerScroll = { scrollTop: 0, scrollLeft: 0 },
+) {
   const { scrollTop, scrollLeft } = containerScroll
   const rect = node.getBoundingClientRect()
 

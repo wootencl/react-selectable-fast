@@ -1,9 +1,10 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import { object, node } from 'prop-types'
 
 class SelectAllButton extends Component {
   static propTypes = {
-    children: PropTypes.object,
-    component: PropTypes.node,
+    children: object,
+    component: node,
   }
 
   static defaultProps = {
@@ -11,7 +12,7 @@ class SelectAllButton extends Component {
   }
 
   static contextTypes = {
-    selectable: React.PropTypes.object,
+    selectable: object,
   }
 
   componentDidMount() {

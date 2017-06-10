@@ -1,4 +1,4 @@
-const isNodeInRoot = (node, root) => {
+export default function isNodeInRoot(node, root) {
   while (node) {
     if (node === root) {
       return true
@@ -8,5 +8,3 @@ const isNodeInRoot = (node, root) => {
 
   return false
 }
-
-export default isNodeInRoot
