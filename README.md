@@ -21,7 +21,7 @@ The main idea of this fork is to eliminate render during selection caused by sta
 ## Usage
 
 Package exports 4 entities `{ SelectableGroup, createSelectable, SelectAll, DeselectAll }`.
-To make other components selectable wrap them using HoF `createSelectable` and put a list of them under `SelectableGroup`.
+To make other components selectable wrap them using HoC `createSelectable`, add passed `selectableRef` prop to the target node and put a list of seletable items under `SelectableGroup`.
 
 ```js
 import React, { Component } from 'react'
@@ -55,8 +55,8 @@ class App extends Component {
 import React from 'react'
 import { createSelectable } from 'react-selectable-fast'
 
-const SomeComponent = () => (
-  <div>...</div>
+const SomeComponent = ({ selectableRef, selected, selecting }) => (
+  <div ref={selectableRef}>...</div>
 )
 
 export default createSelectable(SomeComponent)
