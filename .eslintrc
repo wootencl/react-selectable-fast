@@ -10,7 +10,7 @@
   "parser": "babel-eslint",
   "extends": "airbnb",
   "rules": {
-    "arrow-parens": "off",
+    "arrow-parens": ["error", "as-needed"],
     "semi": ["error", "never"],
     "no-param-reassign": "off",
     "no-return-assign": "off",
@@ -24,7 +24,6 @@
     "react/no-unused-prop-types": "off",
     "react/jsx-filename-extension": "off",
     "import/no-extraneous-dependencies": "off",
-    "babel/arrow-parens": ["error", "as-needed"],
   },
 }
 
