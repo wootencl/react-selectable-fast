@@ -49,8 +49,8 @@
       <div id="demo-container"></div>
       <h2><a class="anchor" href="#usage" id="usage"><span class="octicon octicon-link"></span></a>Usage</h2>
       <h3><a class="anchor" href="#exemple" id="exemple"><span class="octicon octicon-link"></span></a>Example</h3>
-      <p>Package exports 4 components <code>{ SelectableGroup, createSelectable, SelectAll, DeselectAll }</code>.
-To make other components selectable create selectable component with <code>createSelectable()</code> function and put a list of them under <code>SelectableGroup</code>.</p>
+      <p>Package exports 4 entities <code>{ SelectableGroup, createSelectable, SelectAll, DeselectAll }</code>.
+      To make other components selectable wrap them using HoC <code>createSelectable</code>, add passed <code>selectableRef</code> prop to the target node and put a list of seletable items under <code>SelectableGroup</code>.</p>
       <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> { <span class="pl-smi">SelectableGroup</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
 
@@ -76,6 +76,15 @@ To make other components selectable create selectable component with <code>creat
     )
   }
 }</pre></div>
+      <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> { <span class="pl-smi">createSelectable</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">SomeComponent</span> <span class="pl-k">=</span> ({ selectableRef, selected, selecting }) <span class="pl-k">=&gt;</span> (
+  <span class="pl-k">&lt;</span>div ref<span class="pl-k">=</span>{selectableRef}<span class="pl-k">&gt;</span><span class="pl-k">...</span><span class="pl-k">&lt;</span><span class="pl-k">/</span>div<span class="pl-k">&gt;</span>
+)
+
+<span class="pl-k">export</span> <span class="pl-c1">default</span> <span class="pl-smi">createSelectable</span>(SomeComponent)</pre></div>
+
       <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">React</span>, { <span class="pl-smi">Component</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> { <span class="pl-smi">createSelectable</span>, <span class="pl-smi">SelectAll</span>, <span class="pl-smi">DeselectAll</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>react-selectable-fast<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">SomeComponent</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./SomeComponent<span class="pl-pds">'</span></span>
