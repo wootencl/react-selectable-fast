@@ -47,6 +47,26 @@
       <h2><a class="anchor" href="#demo" id="demo"><span class="octicon octicon-link"></span></a>Demo</h2>
       <p>Draw a box with your mouse/touch to select items. Click on + icon of an individual item to select it.</p>
       <div id="demo-container"></div>
+
+      <h2><a id="user-content-javascript-environment-requirements" class="anchor" href="#javascript-environment-requirements"></a>JavaScript environment requirements</h2>
+      <p>The React-Selectable-Fast package distributed on NPM use the widely-supported ES5
+version of JavaScript to support as many browser environments as possible.</p>
+      <p>However, this package expects modern JavaScript globals (<code>Map</code>, <code>Set</code>,
+      <code>Array.from</code>, <code>Array.isArray</code> <code>Object.assign</code>) to be defined. If you support older browsers and
+      devices which may not yet provide these natively, consider including a global
+      polyfill in your bundled application, such as <a href="https://github.com/zloirock/core-js">core-js</a> or
+      <a href="https://babeljs.io/docs/usage/polyfill/">babel-polyfill</a>.</p>
+      <p>A polyfilled environment for React-Selectable-Fast using <a href="https://github.com/zloirock/core-js">core-js</a> to support older browsers
+might look like:</p>
+
+     <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>core-js/fn/object/assign<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>core-js/fn/array/from<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>core-js/fn/array/is-array<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>core-js/fn/map<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>core-js/fn/set<span class="pl-pds">'</span></span>
+
+<span class="pl-k">import</span> <span class="pl-smi">App</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>./myApp<span class="pl-pds">'</span></span>;</pre></div>
+
       <h2><a class="anchor" href="#usage" id="usage"><span class="octicon octicon-link"></span></a>Usage</h2>
       <h3><a class="anchor" href="#exemple" id="exemple"><span class="octicon octicon-link"></span></a>Example</h3>
       <p>Package exports 4 entities <code>{ SelectableGroup, createSelectable, SelectAll, DeselectAll }</code>.
