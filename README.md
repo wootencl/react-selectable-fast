@@ -93,10 +93,10 @@ version of JavaScript to support as many browser environments as possible.
 However, this package expects modern JavaScript globals (`Map`, `Set`,
 `Array.from`, `Array.isArray` `Object.assign`) to be defined. If you support older browsers and
 devices which may not yet provide these natively, consider including a global
-polyfill in your bundled application, such as [core-js][] or
+polyfill in your bundled application, such as [core-js](https://github.com/zloirock/core-js) or
 [babel-polyfill](https://babeljs.io/docs/usage/polyfill/).
 
-A polyfilled environment for React-Selectable-Fast using [core-js][] to support older browsers
+A polyfilled environment for React-Selectable-Fast using [core-js](https://github.com/zloirock/core-js) to support older browsers
 might look like:
 
 ```js
