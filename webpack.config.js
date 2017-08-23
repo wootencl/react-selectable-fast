@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
   devtool: 'eval',
@@ -14,6 +15,12 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
       },
+    ],
+    plugins: [
+      // new BundleAnalyzerPlugin(),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      }),
     ],
   },
 }

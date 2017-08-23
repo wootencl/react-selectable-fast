@@ -1,9 +1,3 @@
-import 'core-js/fn/object/assign'
-import 'core-js/fn/array/from'
-import 'core-js/fn/array/is-array'
-import 'core-js/fn/map'
-import 'core-js/fn/set'
-
 import React, { Component } from 'react'
 import { number, bool, array, string, func, node, object } from 'prop-types'
 import isNodeInRoot from './nodeInRoot'
