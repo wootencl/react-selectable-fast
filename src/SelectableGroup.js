@@ -20,7 +20,7 @@ class SelectableGroup extends Component {
     onSelectionClear: func,
     enableDeselect: bool,
     mixedDeselect: bool,
-
+    resetOnStart: bool,
     /**
      * Scroll container selector
      */
@@ -70,6 +70,7 @@ class SelectableGroup extends Component {
     onSelectionClear: noop,
     allowClickWithoutSelected: true,
     selectionModeClass: 'in-selection-mode',
+    resetOnStart: false,
   }
 
   static childContextTypes = {
@@ -391,6 +392,9 @@ class SelectableGroup extends Component {
 
   mouseDown = e => {
     if (this.mouseDownStarted) return
+    if (this.props.resetOnStart) {
+      this.clearSelection()
+    }
     this.mouseDownStarted = true
     this.mouseUpStarted = false
     e = this.desktopEventCoords(e)
