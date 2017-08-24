@@ -126,3 +126,4 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `component` (String) The component to render. Defaults to `div`.
 * `allowClickWithoutSelected` (Boolean) When disabled items can be selected by click only if there is more than 1 already selected item.
 * `fixedPosition` (Boolean) Whether the `<SelectableGroup />` container is a fixed or absolutely positioned element or the grandchild of one.
+* `resetOnStart` (Boolean) Unselect all items when you start a new drag. Default value is `false`.
