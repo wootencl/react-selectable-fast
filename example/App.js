@@ -46,7 +46,6 @@ class App extends Component {
           onSelectionClear={this.handleSelectionClear}
           onSelectionFinish={this.handleSelectionFinish}
           ignoreList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
-          disabled
         >
           <List items={this.props.items} />
         </SelectableGroup>
