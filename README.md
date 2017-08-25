@@ -128,3 +128,4 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `fixedPosition` (Boolean) Whether the `<SelectableGroup />` container is a fixed or absolutely positioned element or the grandchild of one.
 * `resetOnStart` (Boolean) Unselect all items when you start a new drag. Default value is `false`.
 * `disable` (Boolean) Enable or disable the selectable draggable, useful if you want to enable drag of sub-items. Default value is `false`.
+* `delta` (Number) Value of the CSS transform property scaled list, useful if your list of items in `<SelectableGroup />` is wrapped by a scale css transform property. Default value is `1`.   

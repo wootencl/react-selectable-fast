@@ -18,15 +18,15 @@ const coordsCollide = (aTop, aLeft, bTop, bLeft, aWidth, aHeight, bWidth, bHeigh
   }
 
   return !(
-      // 'a' bottom doesn't touch 'b' top
-        (((aTop + aHeight) - tolerance) < bTop) ||
-        // 'a' top doesn't touch 'b' bottom
-        ((aTop + tolerance) > (bTop + bHeight)) ||
-        // 'a' right doesn't touch 'b' left
-        (((aLeft + aWidth) - tolerance) < bLeft) ||
-        // 'a' left doesn't touch 'b' right
-        ((aLeft + tolerance) > (bLeft + bWidth))
-    )
+    // 'a' bottom doesn't touch 'b' top
+    (((aTop + aHeight) - tolerance) < bTop) ||
+    // 'a' top doesn't touch 'b' bottom
+    ((aTop + tolerance) > (bTop + bHeight)) ||
+    // 'a' right doesn't touch 'b' left
+    (((aLeft + aWidth) - tolerance) < bLeft) ||
+    // 'a' left doesn't touch 'b' right
+    ((aLeft + tolerance) > (bLeft + bWidth))
+  )
 }
 
 /**
@@ -36,19 +36,40 @@ const coordsCollide = (aTop, aLeft, bTop, bLeft, aWidth, aHeight, bWidth, bHeigh
  * @param  {Object|HTMLElement} b
  * @return {bool}
  */
-export default (a, b, tolerance) => {
+export default (a, b, tolerance, delta) => {
+  if (typeof delta === 'undefined') {
+    delta = 1
+  }
+
   const aObj = (a instanceof HTMLElement) ? getBoundsForNode(a) : a
   const bObj = (b instanceof HTMLElement) ? getBoundsForNode(b) : b
+
+  if (delta === 1) {
+    return coordsCollide(
+      aObj.top,
+      aObj.left,
+      bObj.top,
+      bObj.left,
+      aObj.offsetWidth,
+      aObj.offsetHeight,
+      bObj.offsetWidth,
+      bObj.offsetHeight,
+      tolerance,
+
+    )
+  }
+
+  // We have a delta and we need to compute the new values
 
   return coordsCollide(
     aObj.top,
     aObj.left,
     bObj.top,
     bObj.left,
-    aObj.offsetWidth,
-    aObj.offsetHeight,
-    bObj.offsetWidth,
-    bObj.offsetHeight,
+    aObj.computedWidth,
+    aObj.computedHeight,
+    bObj.computedWidth,
+    bObj.computedHeight,
     tolerance,
   )
 }
