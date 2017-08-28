@@ -15,5 +15,7 @@ export default function getBoundsForNode(
     left: rect.left + document.body.scrollLeft + scrollLeft,
     offsetWidth: node.offsetWidth,
     offsetHeight: node.offsetHeight,
+    computedWidth: rect.width,
+    computedHeight: rect.height,
   }
 }

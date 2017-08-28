@@ -5,11 +5,10 @@ import getBoundsForNode from './getBoundsForNode'
 import doObjectsCollide from './doObjectsCollide'
 import Selectbox from './Selectbox'
 
-const noop = () => {}
+const noop = () => { }
 
 class SelectableGroup extends Component {
   static propTypes = {
-    scale: number,
     globalMouse: bool,
     ignoreList: array,
     scrollSpeed: number,
@@ -21,6 +20,8 @@ class SelectableGroup extends Component {
     enableDeselect: bool,
     mixedDeselect: bool,
     resetOnStart: bool,
+    disabled: bool,
+    delta: number,
     /**
      * Scroll container selector
      */
@@ -62,7 +63,6 @@ class SelectableGroup extends Component {
     tolerance: 0,
     globalMouse: false,
     ignoreList: [],
-    scale: 1,
     scrollSpeed: 0.25,
     minimumSpeedFactor: 60,
     duringSelection: noop,
@@ -71,6 +71,8 @@ class SelectableGroup extends Component {
     allowClickWithoutSelected: true,
     selectionModeClass: 'in-selection-mode',
     resetOnStart: false,
+    disabled: false,
+    delta: 1,
   }
 
   static childContextTypes = {
@@ -137,11 +139,6 @@ class SelectableGroup extends Component {
     document.removeEventListener('mouseup', this.mouseUp)
     document.removeEventListener('touchend', this.mouseUp)
   }
-
-  applyScale = (top, left) => ({
-    scaledTop: top / this.props.scale,
-    scaledLeft: left / this.props.scale,
-  })
 
   setScollTop = e => {
     const scrollTop = this.scrollContainer.scrollTop
@@ -210,7 +207,7 @@ class SelectableGroup extends Component {
     }
   }
 
-  applyContainerScroll = (value, scroll) => value + (scroll / this.props.scale)
+  applyContainerScroll = (value, scroll) => value + (scroll)
 
   getWindowScroll = () => {
     if (this.supportPageOffset) {
@@ -239,11 +236,12 @@ class SelectableGroup extends Component {
     this.mouseMoved = true
 
     const scrollTop = this.scrollContainer.scrollTop
-    const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
+    const eventTop = e.pageY
+    const eventLeft = e.pageX
     const { windowTopScroll, windowLeftScroll } = this.getWindowScroll()
 
     const top = this.applyContainerScroll(
-      scaledTop - this.scrollBounds.top,
+      eventTop - this.scrollBounds.top,
       scrollTop - windowTopScroll,
     )
 
@@ -255,13 +253,13 @@ class SelectableGroup extends Component {
     const boxHeight = boxTop - top
     boxTop = Math.min(boxTop - boxHeight, boxTop)
 
-    const bowWidth = this.mouseDownData.boxLeft - scaledLeft
+    const bowWidth = this.mouseDownData.boxLeft - eventLeft
     const leftContainerRelative = this.mouseDownData.boxLeft - this.scrollBounds.left
 
     const boxLeft = this.applyContainerScroll(
       Math.min(
-        leftContainerRelative - (bowWidth / this.props.scale),
-        leftContainerRelative / this.props.scale,
+        leftContainerRelative - bowWidth,
+        leftContainerRelative,
       ),
       -windowLeftScroll,
     )
@@ -312,8 +310,7 @@ class SelectableGroup extends Component {
     if (this.inIgnoreList(item.node)) {
       return null
     }
-
-    const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance)
+    const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance, this.props.delta)
     const { selecting, selected } = item.state
 
     if (click && isCollided) {
@@ -391,7 +388,7 @@ class SelectableGroup extends Component {
   }
 
   mouseDown = e => {
-    if (this.mouseDownStarted) return
+    if (this.mouseDownStarted || this.props.disabled) return
     if (this.props.resetOnStart) {
       this.clearSelection()
     }
@@ -427,10 +424,9 @@ class SelectableGroup extends Component {
     this.updateRootBounds()
     this.updateRegistry()
 
-    const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
     this.mouseDownData = {
-      boxLeft: scaledLeft,
-      boxTop: scaledTop,
+      boxLeft: e.pageX,
+      boxTop: e.pageY,
       scrollTop: this.scrollContainer.scrollTop,
       scrollLeft: this.scrollContainer.scrollLeft,
       target: e.target,
@@ -464,10 +460,12 @@ class SelectableGroup extends Component {
     if (!this.mouseDownData) return
 
     const e = this.desktopEventCoords(event)
-    const { scaledTop, scaledLeft } = this.applyScale(e.pageY, e.pageX)
+
+    const eventTop = e.pageY
+    const eventLeft = e.pageX
 
     if (!this.mouseMoved && isNodeInRoot(e.target, this.rootNode)) {
-      this.handleClick(e, scaledTop, scaledLeft)
+      this.handleClick(e, eventTop, eventLeft)
     } else {
       for (const item of this.selectingItems.values()) {
         item.setState({ selected: true, selecting: false })
