@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { number, bool, array, string, func, node, object } from 'prop-types'
 import isNodeInRoot from './nodeInRoot'
-import getBoundsForNode from './getBoundsForNode'
+import getBoundsForNode, { getDocumentScroll } from './getBoundsForNode'
 import doObjectsCollide from './doObjectsCollide'
 import Selectbox from './Selectbox'
 
@@ -111,18 +111,12 @@ class SelectableGroup extends Component {
   }
 
   componentDidMount() {
-    this.resizeInProgress = false
     this.rootNode = this.selectableGroup
     this.scrollContainer = document.querySelector(this.props.scrollContainer) || this.rootNode
-    this.initialRootBounds = this.rootNode.getBoundingClientRect()
     this.rootNode.addEventListener('mousedown', this.mouseDown)
     this.rootNode.addEventListener('touchstart', this.mouseDown)
     document.addEventListener('keydown', this.keyListener)
     document.addEventListener('keyup', this.keyListener)
-    this.isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)
-
-    this.supportPageOffset = window.pageXOffset !== undefined
-    this.isCSS1Compat = ((document.compatMode || '') === 'CSS1Compat')
   }
 
   componentWillUnmount() {
@@ -142,11 +136,11 @@ class SelectableGroup extends Component {
 
   setScollTop = e => {
     const scrollTop = this.scrollContainer.scrollTop
-    this.checkScrollUp(e, scrollTop)
-    this.checkScrollDown(e, scrollTop)
+    this.checkScrollTop(e, scrollTop)
+    this.checkScrollBottom(e, scrollTop)
   }
 
-  checkScrollUp = (e, currentTop) => {
+  checkScrollTop = (e, currentTop) => {
     const { minimumSpeedFactor, scrollSpeed } = this.props
     const offset = this.scrollBounds.top - e.clientY
 
@@ -156,7 +150,7 @@ class SelectableGroup extends Component {
     }
   }
 
-  checkScrollDown = (e, currentTop) => {
+  checkScrollBottom = (e, currentTop) => {
     const { minimumSpeedFactor, scrollSpeed } = this.props
     const offset = e.clientY - this.scrollBounds.bottom
 
@@ -167,9 +161,6 @@ class SelectableGroup extends Component {
   }
 
   updateRootBounds() {
-    if (this.scrollBounds) {
-      this.oldScrollBounds = this.scrollBounds
-    }
     this.scrollBounds = this.scrollContainer.getBoundingClientRect()
     this.maxScroll = this.scrollContainer.scrollHeight - this.scrollContainer.clientHeight
   }
@@ -209,24 +200,6 @@ class SelectableGroup extends Component {
 
   applyContainerScroll = (value, scroll) => value + (scroll)
 
-  getWindowScroll = () => {
-    if (this.supportPageOffset) {
-      return {
-        windowTopScroll: window.pageYOffset,
-        windowLeftScroll: window.pageXOffset,
-      }
-    }
-
-    return {
-      windowTopScroll: this.isCSS1Compat
-        ? document.documentElement.scrollTop
-        : document.body.scrollTop,
-      windowLeftScroll: this.isCSS1Compat
-        ? document.documentElement.scrollLeft
-        : document.body.scrollLeft,
-    }
-  }
-
   openSelectbox = event => {
     const e = this.desktopEventCoords(event)
     this.setScollTop(e)
@@ -238,16 +211,16 @@ class SelectableGroup extends Component {
     const scrollTop = this.scrollContainer.scrollTop
     const eventTop = e.pageY
     const eventLeft = e.pageX
-    const { windowTopScroll, windowLeftScroll } = this.getWindowScroll()
+    const { documentScrollTop, documentScrollLeft } = getDocumentScroll()
 
     const top = this.applyContainerScroll(
       eventTop - this.scrollBounds.top,
-      scrollTop - windowTopScroll,
+      scrollTop - documentScrollTop,
     )
 
     let boxTop = this.applyContainerScroll(
       this.mouseDownData.boxTop - this.scrollBounds.top,
-      this.mouseDownData.scrollTop - windowTopScroll,
+      this.mouseDownData.scrollTop - documentScrollTop,
     )
 
     const boxHeight = boxTop - top
@@ -261,7 +234,7 @@ class SelectableGroup extends Component {
         leftContainerRelative - bowWidth,
         leftContainerRelative,
       ),
-      -windowLeftScroll,
+      -documentScrollLeft,
     )
 
     this.selectbox.setState({
