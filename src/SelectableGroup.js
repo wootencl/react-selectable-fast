@@ -19,6 +19,7 @@ class SelectableGroup extends Component {
     onSelectionClear: func,
     enableDeselect: bool,
     mixedDeselect: bool,
+    deselectOnEsc: bool,
     resetOnStart: bool,
     disabled: bool,
     delta: number,
@@ -72,6 +73,7 @@ class SelectableGroup extends Component {
     selectionModeClass: 'in-selection-mode',
     resetOnStart: false,
     disabled: false,
+    deselectOnEsc: true,
     delta: 1,
   }
 
@@ -115,15 +117,22 @@ class SelectableGroup extends Component {
     this.scrollContainer = document.querySelector(this.props.scrollContainer) || this.rootNode
     this.rootNode.addEventListener('mousedown', this.mouseDown)
     this.rootNode.addEventListener('touchstart', this.mouseDown)
-    document.addEventListener('keydown', this.keyListener)
-    document.addEventListener('keyup', this.keyListener)
+
+    if (this.props.deselectOnEsc) {
+      document.addEventListener('keydown', this.keyListener)
+      document.addEventListener('keyup', this.keyListener)
+    }
   }
 
   componentWillUnmount() {
     this.rootNode.removeEventListener('mousedown', this.mouseDown)
     this.rootNode.removeEventListener('touchstart', this.mouseDown)
-    document.removeEventListener('keydown', this.keyListener)
-    document.removeEventListener('keyup', this.keyListener)
+
+    if (this.props.deselectOnEsc) {
+      document.removeEventListener('keydown', this.keyListener)
+      document.removeEventListener('keyup', this.keyListener)
+    }
+
     this.removeTempEventListeners()
   }
 
@@ -486,13 +495,11 @@ class SelectableGroup extends Component {
   }
 
   keyListener = e => {
-    this.ctrlPressed = e.ctrlKey || e.metaKey
-
-    if (this.ctrlPressed) {
+    if (e.ctrlKey || e.metaKey) {
       return
     }
 
-    if (e.keyCode === 27) {
+    if (e.keyCode === 27) { // escape
       this.clearSelection()
     }
   }

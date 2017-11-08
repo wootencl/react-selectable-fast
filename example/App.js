@@ -36,9 +36,11 @@ class App extends Component {
           Selected: <span className="counter">{selectedItems.length}</span>
         </p>
         <SelectableGroup
+          ref={ref => window.selectableGroup = ref}
           className="main"
           clickClassName="tick"
           enableDeselect
+          deselectOnEsc={false}
           tolerance={tolerance}
           globalMouse={isGlobal}
           allowClickWithoutSelected={false}
