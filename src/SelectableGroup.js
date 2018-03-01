@@ -14,6 +14,8 @@ class SelectableGroup extends Component {
     scrollSpeed: number,
     minimumSpeedFactor: number,
     allowClickWithoutSelected: bool,
+    className: string,
+    selectboxClassName: string,
     style: object,
     selectionModeClass: string,
     onSelectionClear: func,
@@ -552,6 +554,7 @@ class SelectableGroup extends Component {
         <Selectbox
           ref={this.getSelectboxRef}
           fixedPosition={this.props.fixedPosition}
+          className={this.props.selectboxClassName}
         />
         {this.props.children}
       </this.props.component>

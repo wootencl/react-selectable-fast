@@ -123,6 +123,7 @@ The `<SelectableGroup />` component accepts a few optional props:
 * `tolerance` (Number) The amount of buffer to add around your `<SelectableGroup />` container, in pixels.
 * `className` (String) Class of selectable group element.
 * `selectionModeClass` (String) Class indicating that there is more than 1 selected item. Defaults to 'in-selection-mode'.
+* `selectboxClassName` (String) Class of selectbox element.
 * `component` (String) The component to render. Defaults to `div`.
 * `allowClickWithoutSelected` (Boolean) When disabled items can be selected by click only if there is more than 1 already selected item.
 * `fixedPosition` (Boolean) Whether the `<SelectableGroup />` container is a fixed or absolutely positioned element or the grandchild of one.
