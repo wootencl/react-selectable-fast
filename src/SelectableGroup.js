@@ -373,18 +373,19 @@ class SelectableGroup extends Component {
 
   mouseDown = e => {
     if (this.mouseDownStarted || this.props.disabled) return
-    if (this.props.resetOnStart) {
-      this.clearSelection()
-    }
-    this.mouseDownStarted = true
-    this.mouseUpStarted = false
-    e = this.desktopEventCoords(e)
 
     this.updateWhiteListNodes()
     if (this.inIgnoreList(e.target)) {
       this.mouseDownStarted = false
       return
     }
+
+    if (this.props.resetOnStart) {
+      this.clearSelection()
+    }
+    this.mouseDownStarted = true
+    this.mouseUpStarted = false
+    e = this.desktopEventCoords(e)
 
     if (!this.props.globalMouse && !isNodeInRoot(e.target, this.selectableGroup)) {
       const offsetData = getBoundsForNode(this.selectableGroup)
