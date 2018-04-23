@@ -289,8 +289,7 @@ a:hover {
   padding: 10px;
   overflow: hidden;
 }
-.item:nth-child(10),
-.item:nth-child(27) {
+.item.not-selectable {
   background: silver;
 }
 .item .tick {
@@ -316,17 +315,13 @@ a:hover {
 .item.selecting {
   border: 1px solid rebeccapurple;
 }
-.not-selectable {
-  display: inline-block;
-  margin: 1em 5px;
-  color: #4285f4;
-}
+.not-selectable {}
 .counter {
   color: #009688;
 }
 .selectable-button {
   display: inline-block;
-  margin: 3px;
+  margin: 0 3px 10px 3px;
 }
 .in-selection-mode .item {
   cursor: pointer;

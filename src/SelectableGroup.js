@@ -196,6 +196,8 @@ class SelectableGroup extends Component {
 
   unregisterSelectable = selectableItem => {
     this.registry.delete(selectableItem)
+    this.selectedItems.delete(selectableItem)
+    this.selectingItems.delete(selectableItem)
   }
 
   toggleSelectionMode() {

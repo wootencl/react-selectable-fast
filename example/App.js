@@ -7,6 +7,7 @@ class App extends Component {
     selectedItems: [],
     selectingItems: [],
     tolerance: 0,
+    disableFirstRow: false,
   }
 
   handleSelecting = selectingItems => {
@@ -25,8 +26,22 @@ class App extends Component {
     console.log('Cancel selection')
   }
 
+  toggleFirstRow = () => {
+    this.setState({ disableFirstRow: !this.state.disableFirstRow })
+  }
+
   render() {
-    const { selectedItems, selectingItems, tolerance, isGlobal } = this.state
+    const { items } = this.props
+
+    const {
+      selectedItems,
+      selectingItems,
+      tolerance,
+      isGlobal,
+      disableFirstRow,
+    } = this.state
+
+    const itemsToRender = disableFirstRow ? items.slice(5) : items
 
     return (
       <div>
@@ -34,6 +49,9 @@ class App extends Component {
           Selecting: <span className="counter">{selectingItems.length}</span>
           <br />
           Selected: <span className="counter">{selectedItems.length}</span>
+          <br />
+          <br />
+          <button onClick={this.toggleFirstRow}>Toggle first row</button>
         </p>
         <SelectableGroup
           ref={ref => window.selectableGroup = ref}
@@ -47,9 +65,9 @@ class App extends Component {
           duringSelection={this.handleSelecting}
           onSelectionClear={this.handleSelectionClear}
           onSelectionFinish={this.handleSelectionFinish}
-          ignoreList={['.not-selectable', '.item:nth-child(10)', '.item:nth-child(27)']}
+          ignoreList={['.not-selectable']}
         >
-          <List items={this.props.items} />
+          <List items={itemsToRender} />
         </SelectableGroup>
       </div>
     )

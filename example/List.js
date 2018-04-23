@@ -20,9 +20,9 @@ class List extends Component {
           </DeselectAll>
         </div>
         <div className="albums">
-          {this.props.items.map((item, i) => (
+          {this.props.items.map(item => (
             <SelectableAlbum
-              key={`${item.title}${i}`}
+              key={item.year}
               title={item.title}
               year={item.year}
             />

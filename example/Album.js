@@ -5,7 +5,12 @@ import Label from './Label'
 const Album = ({ selectableRef, selected, selecting, title, year }) => (
   <div
     ref={selectableRef}
-    className={`item ${selecting && 'selecting'} ${selected && 'selected'}`}
+    className={`
+      ${(year === 10 || year === 27) && 'not-selectable'}
+      item
+      ${selecting && 'selecting'}
+      ${selected && 'selected'}
+    `}
   >
     <div className="tick">+</div>
     <h2>{title}</h2>
