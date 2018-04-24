@@ -2,8 +2,11 @@ const path = require('path')
 const webpack = require('webpack')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
+const env = process.env.NODE_ENV || 'production'
+
 module.exports = {
   devtool: 'source-map',
+  mode: env,
   entry: path.resolve(__dirname, 'src', 'index.js'),
   externals: {
     react: {
@@ -21,7 +24,7 @@ module.exports = {
     libraryTarget: 'umd',
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -32,7 +35,7 @@ module.exports = {
   plugins: [
     // new BundleAnalyzerPlugin(),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.NODE_ENV': JSON.stringify(env),
     }),
   ],
 }
