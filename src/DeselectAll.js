@@ -19,7 +19,7 @@ class DeselectAllButton extends Component {
     this.root.addEventListener('mousedown', e => e.stopPropagation())
   }
 
-  getRootRef = c => this.root = c
+  getRootRef = c => (this.root = c)
 
   render() {
     return (

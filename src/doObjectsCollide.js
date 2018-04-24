@@ -18,14 +18,13 @@ const coordsCollide = (aTop, aLeft, bTop, bLeft, aWidth, aHeight, bWidth, bHeigh
   }
 
   return !(
-    // 'a' bottom doesn't touch 'b' top
-    (((aTop + aHeight) - tolerance) < bTop) ||
+    aTop + aHeight - tolerance < bTop ||
     // 'a' top doesn't touch 'b' bottom
-    ((aTop + tolerance) > (bTop + bHeight)) ||
+    aTop + tolerance > bTop + bHeight ||
     // 'a' right doesn't touch 'b' left
-    (((aLeft + aWidth) - tolerance) < bLeft) ||
+    aLeft + aWidth - tolerance < bLeft ||
     // 'a' left doesn't touch 'b' right
-    ((aLeft + tolerance) > (bLeft + bWidth))
+    aLeft + tolerance > bLeft + bWidth
   )
 }
 
@@ -41,8 +40,8 @@ export default (a, b, tolerance, delta) => {
     delta = 1
   }
 
-  const aObj = (a instanceof HTMLElement) ? getBoundsForNode(a) : a
-  const bObj = (b instanceof HTMLElement) ? getBoundsForNode(b) : b
+  const aObj = a instanceof HTMLElement ? getBoundsForNode(a) : a
+  const bObj = b instanceof HTMLElement ? getBoundsForNode(b) : b
 
   if (delta === 1) {
     return coordsCollide(
@@ -54,8 +53,7 @@ export default (a, b, tolerance, delta) => {
       aObj.offsetHeight,
       bObj.offsetWidth,
       bObj.offsetHeight,
-      tolerance,
-
+      tolerance
     )
   }
 
@@ -70,6 +68,6 @@ export default (a, b, tolerance, delta) => {
     aObj.computedHeight,
     bObj.computedWidth,
     bObj.computedHeight,
-    tolerance,
+    tolerance
   )
 }

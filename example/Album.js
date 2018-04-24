@@ -2,7 +2,9 @@ import React from 'react'
 import { createSelectable } from '../src'
 import Label from './Label'
 
-const Album = ({ selectableRef, selected, selecting, title, year }) => (
+const Album = ({
+  selectableRef, selected, selecting, title, year,
+}) => (
   <div
     ref={selectableRef}
     className={`

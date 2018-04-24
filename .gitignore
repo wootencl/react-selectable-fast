@@ -1,8 +1,8 @@
 example/bundle.js
-node_modules
 lib
 dist
 build
+node_modules
 .DS_Store
 *.log
 .idea

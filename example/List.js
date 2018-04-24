@@ -21,11 +21,7 @@ class List extends Component {
         </div>
         <div className="albums">
           {this.props.items.map(item => (
-            <SelectableAlbum
-              key={item.year}
-              title={item.title}
-              year={item.year}
-            />
+            <SelectableAlbum key={item.year} title={item.title} year={item.year} />
           ))}
         </div>
       </div>

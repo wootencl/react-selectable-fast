@@ -5,16 +5,17 @@ module.exports = {
     host: '0.0.0.0',
     disableHostCheck: true,
   },
+  mode: 'development',
   devtool: 'eval',
   entry: path.resolve(__dirname, 'example.js'),
   output: {
-    path: path.resolve(__dirname, 'example'),
+    path: path.resolve(__dirname),
     publicPath: '',
     filename: 'bundle.js',
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         loader: 'babel-loader',

@@ -5,7 +5,7 @@ import getBoundsForNode, { getDocumentScroll } from './getBoundsForNode'
 import doObjectsCollide from './doObjectsCollide'
 import Selectbox from './Selectbox'
 
-const noop = () => { }
+const noop = () => {}
 
 class SelectableGroup extends Component {
   static propTypes = {
@@ -146,7 +146,8 @@ class SelectableGroup extends Component {
   }
 
   setScollTop = e => {
-    const scrollTop = this.scrollContainer.scrollTop
+    const { scrollTop } = this.scrollContainer
+
     this.checkScrollTop(e, scrollTop)
     this.checkScrollBottom(e, scrollTop)
   }
@@ -156,7 +157,7 @@ class SelectableGroup extends Component {
     const offset = this.scrollBounds.top - e.clientY
 
     if (offset > 0 || e.clientY < 0) {
-      const newTop = currentTop - ((Math.max(offset, minimumSpeedFactor)) * scrollSpeed)
+      const newTop = currentTop - Math.max(offset, minimumSpeedFactor) * scrollSpeed
       this.scrollContainer.scrollTop = newTop
     }
   }
@@ -166,7 +167,8 @@ class SelectableGroup extends Component {
     const offset = e.clientY - this.scrollBounds.bottom
 
     if (offset > 0 || e.clientY > window.innerHeight) {
-      const newTop = currentTop + ((Math.max(offset, minimumSpeedFactor)) * scrollSpeed)
+      const newTop = currentTop + Math.max(offset, minimumSpeedFactor) * scrollSpeed
+
       this.scrollContainer.scrollTop = Math.min(newTop, this.maxScroll)
     }
   }
@@ -201,7 +203,10 @@ class SelectableGroup extends Component {
   }
 
   toggleSelectionMode() {
-    const { selectedItems, state: { selectionMode } } = this
+    const {
+      selectedItems,
+      state: { selectionMode },
+    } = this
 
     if (selectedItems.size && !selectionMode) {
       this.setState({ selectionMode: true })
@@ -211,7 +216,7 @@ class SelectableGroup extends Component {
     }
   }
 
-  applyContainerScroll = (value, scroll) => value + (scroll)
+  applyContainerScroll = (value, scroll) => value + scroll
 
   openSelectbox = event => {
     const e = this.desktopEventCoords(event)
@@ -221,19 +226,19 @@ class SelectableGroup extends Component {
     this.mouseMoveStarted = true
     this.mouseMoved = true
 
-    const scrollTop = this.scrollContainer.scrollTop
+    const { scrollTop } = this.scrollContainer
     const eventTop = e.pageY
     const eventLeft = e.pageX
     const { documentScrollTop, documentScrollLeft } = getDocumentScroll()
 
     const top = this.applyContainerScroll(
       eventTop - this.scrollBounds.top,
-      scrollTop - documentScrollTop,
+      scrollTop - documentScrollTop
     )
 
     let boxTop = this.applyContainerScroll(
       this.mouseDownData.boxTop - this.scrollBounds.top,
-      this.mouseDownData.scrollTop - documentScrollTop,
+      this.mouseDownData.scrollTop - documentScrollTop
     )
 
     const boxHeight = boxTop - top
@@ -243,24 +248,24 @@ class SelectableGroup extends Component {
     const leftContainerRelative = this.mouseDownData.boxLeft - this.scrollBounds.left
 
     const boxLeft = this.applyContainerScroll(
-      Math.min(
-        leftContainerRelative - bowWidth,
-        leftContainerRelative,
-      ),
-      -documentScrollLeft,
+      Math.min(leftContainerRelative - bowWidth, leftContainerRelative),
+      -documentScrollLeft
     )
 
-    this.selectbox.setState({
-      isBoxSelecting: true,
-      boxWidth: Math.abs(bowWidth),
-      boxHeight: Math.abs(boxHeight),
-      boxLeft,
-      boxTop,
-    }, () => {
-      this.updateSelecting()
-      this.props.duringSelection([...this.selectingItems])
-      this.mouseMoveStarted = false
-    })
+    this.selectbox.setState(
+      {
+        isBoxSelecting: true,
+        boxWidth: Math.abs(bowWidth),
+        boxHeight: Math.abs(boxHeight),
+        boxLeft,
+        boxTop,
+      },
+      () => {
+        this.updateSelecting()
+        this.props.duringSelection([...this.selectingItems])
+        this.mouseMoveStarted = false
+      }
+    )
   }
 
   updateSelecting = () => {
@@ -268,6 +273,7 @@ class SelectableGroup extends Component {
     if (!selectbox) return
 
     const selectboxBounds = getBoundsForNode(selectbox)
+
     this.selectItems({
       ...selectboxBounds,
       offsetWidth: selectboxBounds.offsetWidth || 1,
@@ -281,14 +287,7 @@ class SelectableGroup extends Component {
     selectboxBounds.left += this.scrollContainer.scrollLeft
 
     for (const item of this.registry.values()) {
-      this.processItem(
-        item,
-        tolerance,
-        selectboxBounds,
-        click,
-        enableDeselect,
-        mixedDeselect,
-      )
+      this.processItem(item, tolerance, selectboxBounds, click, enableDeselect, mixedDeselect)
     }
   }
 
@@ -296,6 +295,7 @@ class SelectableGroup extends Component {
     if (this.inIgnoreList(item.node)) {
       return null
     }
+
     const isCollided = doObjectsCollide(selectboxBounds, item.bounds, tolerance, this.props.delta)
     const { selecting, selected } = item.state
 
@@ -305,30 +305,41 @@ class SelectableGroup extends Component {
       } else {
         this.selectedItems.add(item)
       }
+
       item.setState({ selected: !selected })
-      return this.clickedItem = item
+
+      return (this.clickedItem = item)
     }
 
     if (!click && isCollided) {
       if (selected && enableDeselect && (!this.selectionStarted || mixedDeselect)) {
         item.setState({ selected: false })
         item.deselected = true
+
         this.deselectionStarted = true
+
         return this.selectedItems.delete(item)
       }
 
       const canSelect = mixedDeselect ? !item.deselected : !this.deselectionStarted
+
       if (!selecting && !selected && canSelect) {
         item.setState({ selecting: true })
+
         this.selectionStarted = true
-        return this.selectingItems.add(item)
+        this.selectingItems.add(item)
+
+        return { updateSelecting: true }
       }
     }
 
     if (!click && !isCollided && selecting) {
       if (this.selectingItems.has(item)) {
         item.setState({ selecting: false })
-        return this.selectingItems.delete(item)
+
+        this.selectingItems.delete(item)
+
+        return { updateSelecting: true }
       }
     }
 
@@ -340,6 +351,7 @@ class SelectableGroup extends Component {
       item.setState({ selected: false })
       this.selectedItems.delete(item)
     }
+
     this.setState({ selectionMode: false })
     this.props.onSelectionFinish([...this.selectedItems])
     this.props.onSelectionClear()
@@ -362,9 +374,10 @@ class SelectableGroup extends Component {
       return this.ignoreCheckCache.get(target)
     }
 
-    const shouldBeIgnored = this.ignoreListNodes.some(ignoredNode => (
-      target === ignoredNode || ignoredNode.contains(target)
-    ))
+    const shouldBeIgnored = this.ignoreListNodes.some(
+      ignoredNode => target === ignoredNode || ignoredNode.contains(target)
+    )
+
     this.ignoreCheckCache.set(target, shouldBeIgnored)
     return shouldBeIgnored
   }
@@ -403,7 +416,7 @@ class SelectableGroup extends Component {
           left: e.pageX,
           offsetWidth: 0,
           offsetHeight: 0,
-        },
+        }
       )
       if (!collides) return
     }
@@ -420,7 +433,6 @@ class SelectableGroup extends Component {
     }
 
     e.preventDefault()
-
 
     document.addEventListener('mousemove', this.openSelectbox)
     document.addEventListener('touchmove', this.openSelectbox)
@@ -487,7 +499,15 @@ class SelectableGroup extends Component {
       isMouseUpOnClickElement ||
       this.ctrlPressed
     ) {
-      this.selectItems({ top, left, offsetWidth: 0, offsetHeight: 0 }, { click: true })
+      this.selectItems(
+        {
+          top,
+          left,
+          offsetWidth: 0,
+          offsetHeight: 0,
+        },
+        { click: true }
+      )
       this.props.onSelectionFinish([...this.selectedItems], this.clickedItem)
 
       if (e.which === 1) {
@@ -504,7 +524,8 @@ class SelectableGroup extends Component {
       return
     }
 
-    if (e.keyCode === 27) { // escape
+    if (e.keyCode === 27) {
+      // escape
       this.clearSelection()
     }
   }
@@ -524,17 +545,14 @@ class SelectableGroup extends Component {
    * coordinates, regardless of whether the action is from mobile or desktop.
    */
   desktopEventCoords(e) {
-    if (e.pageX === undefined || e.pageY === undefined) { // Touch-device
-      if (
-        e.targetTouches[0] !== undefined &&
-        e.targetTouches[0].pageX !== undefined
-      ) { // For touchmove
+    if (e.pageX === undefined || e.pageY === undefined) {
+      // Touch-device
+      if (e.targetTouches[0] !== undefined && e.targetTouches[0].pageX !== undefined) {
+        // For touchmove
         e.pageX = e.targetTouches[0].pageX
         e.pageY = e.targetTouches[0].pageY
-      } else if (
-        e.changedTouches[0] !== undefined &&
-        e.changedTouches[0].pageX !== undefined
-      ) { // For touchstart
+      } else if (e.changedTouches[0] !== undefined && e.changedTouches[0].pageX !== undefined) {
+        // For touchstart
         e.pageX = e.changedTouches[0].pageX
         e.pageY = e.changedTouches[0].pageY
       }
@@ -542,17 +560,17 @@ class SelectableGroup extends Component {
     return e
   }
 
-  getGroupRef = c => this.selectableGroup = c
-  getSelectboxRef = c => this.selectbox = c
+  getGroupRef = c => (this.selectableGroup = c)
+  getSelectboxRef = c => (this.selectbox = c)
 
   render() {
     return (
       <this.props.component
         ref={this.getGroupRef}
         style={this.props.style}
-        className={
-          `${this.props.className} ${this.state.selectionMode ? this.props.selectionModeClass : ''}`
-        }
+        className={`${this.props.className} ${
+          this.state.selectionMode ? this.props.selectionModeClass : ''
+        }`}
       >
         <Selectbox
           ref={this.getSelectboxRef}

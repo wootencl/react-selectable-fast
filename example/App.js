@@ -1,29 +1,25 @@
-import React, { Component } from 'react'
+import React, { Component, createRef } from 'react'
 import { SelectableGroup } from '../src'
+import Counters from './Counters'
 import List from './List'
 
 class App extends Component {
   state = {
-    selectedItems: [],
-    selectingItems: [],
-    tolerance: 0,
     disableFirstRow: false,
   }
 
+  countersRef = createRef()
+
   handleSelecting = selectingItems => {
-    this.setState({ selectingItems })
+    this.countersRef.current.handleSelecting(selectingItems)
   }
 
   handleSelectionFinish = selectedItems => {
-    this.setState({
-      selectedItems,
-      selectingItems: [],
-    })
-    console.log(`Finished selection ${selectedItems.length}`)
+    this.countersRef.current.handleSelectionFinish(selectedItems)
   }
 
   handleSelectionClear() {
-    console.log('Cancel selection')
+    console.log('Cancel selection') // eslint-disable-line no-console
   }
 
   toggleFirstRow = () => {
@@ -32,35 +28,20 @@ class App extends Component {
 
   render() {
     const { items } = this.props
-
-    const {
-      selectedItems,
-      selectingItems,
-      tolerance,
-      isGlobal,
-      disableFirstRow,
-    } = this.state
+    const { disableFirstRow } = this.state
 
     const itemsToRender = disableFirstRow ? items.slice(5) : items
 
     return (
       <div>
-        <p>
-          Selecting: <span className="counter">{selectingItems.length}</span>
-          <br />
-          Selected: <span className="counter">{selectedItems.length}</span>
-          <br />
-          <br />
-          <button onClick={this.toggleFirstRow}>Toggle first row</button>
-        </p>
+        <Counters ref={this.countersRef} />
         <SelectableGroup
-          ref={ref => window.selectableGroup = ref}
+          ref={ref => (window.selectableGroup = ref)}
           className="main"
           clickClassName="tick"
           enableDeselect
+          tolerance={0}
           deselectOnEsc={false}
-          tolerance={tolerance}
-          globalMouse={isGlobal}
           allowClickWithoutSelected={false}
           duringSelection={this.handleSelecting}
           onSelectionClear={this.handleSelectionClear}

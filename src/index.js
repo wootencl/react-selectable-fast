@@ -13,16 +13,12 @@ if (process.env.NODE_ENV === 'development') {
     typeof Array.isArray !== 'function' ||
     typeof Object.assign !== 'function'
   ) {
-    throw new Error(
-      'React-Selectable-Fast requires Map, Set, Array.from, Array.isArray, and Object.assign to exist. ' +
-        'Use a polyfill to provide these for older browsers.',
-    )
+    throw new Error(`
+      React-Selectable-Fast requires Map, Set, Array.from,
+      Array.isArray, and Object.assign to exist.
+      Use a polyfill to provide these for older browsers.
+    `)
   }
 }
 
-export {
-  SelectableGroup,
-  createSelectable,
-  SelectAll,
-  DeselectAll,
-}
+export { SelectableGroup, createSelectable, SelectAll, DeselectAll }

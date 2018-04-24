@@ -10,10 +10,21 @@
   "parser": "babel-eslint",
   "extends": "airbnb",
   "rules": {
-    "arrow-parens": ["error", "as-needed"],
+    "max-len": ["error", 100],
     "semi": ["error", "never"],
+    "arrow-parens": ["error", "as-needed"],
+    "comma-dangle": [2, {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      "functions": "ignore"
+    }],
+
+    "function-paren-newline": "off",
     "no-param-reassign": "off",
     "no-return-assign": "off",
+    "no-mixed-operators": "off",
     "no-restricted-syntax": "off",
     "class-methods-use-this": "off",
     "react/sort-comp": "off",

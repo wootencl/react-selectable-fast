@@ -12,8 +12,8 @@ class Selectbox extends Component {
   }
 
   state = {
-    top: 0,
-    left: 0,
+    boxTop: 0,
+    boxLeft: 0,
     boxWidth: 0,
     boxHeight: 0,
     isBoxSelecting: false,
@@ -21,7 +21,7 @@ class Selectbox extends Component {
 
   getRef = () => this.selectbox
 
-  getSelectboxRef = c => this.selectbox = c
+  getSelectboxRef = c => (this.selectbox = c)
 
   render() {
     const boxStyle = {
@@ -36,14 +36,9 @@ class Selectbox extends Component {
 
     return (
       <div>
-        {
-          this.state.isBoxSelecting &&
-          <div
-            ref={this.getSelectboxRef}
-            style={boxStyle}
-            className={this.props.className}
-          />
-        }
+        {this.state.isBoxSelecting && (
+          <div ref={this.getSelectboxRef} style={boxStyle} className={this.props.className} />
+        )}
       </div>
     )
   }

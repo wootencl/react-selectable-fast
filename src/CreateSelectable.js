@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { object, bool } from 'prop-types'
 import getBoundsForNode from './getBoundsForNode'
 
-const createSelectable = WrappedComponent => (
+const createSelectable = WrappedComponent =>
   class SelectableItem extends Component {
     static propTypes = {
       selected: bool,
@@ -34,7 +34,7 @@ const createSelectable = WrappedComponent => (
       this.context.selectable.register(this)
     }
 
-    selectableRef = ref => this.node = ref
+    selectableRef = ref => (this.node = ref)
 
     render() {
       return (
@@ -47,6 +47,5 @@ const createSelectable = WrappedComponent => (
       )
     }
   }
-)
 
 export default createSelectable

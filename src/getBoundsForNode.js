@@ -2,13 +2,13 @@ export function getDocumentScroll() {
   const documentScrollTop = Math.max(
     window.pageYOffset,
     document.documentElement.scrollTop,
-    document.body.scrollTop,
+    document.body.scrollTop
   )
 
   const documentScrollLeft = Math.max(
     window.pageXOffset,
     document.documentElement.scrollLeft,
-    document.body.scrollLeft,
+    document.body.scrollLeft
   )
 
   return { documentScrollTop, documentScrollLeft }
@@ -19,10 +19,7 @@ export function getDocumentScroll() {
  * @param  {HTMLElement} node
  * @return {Object}
  */
-export default function getBoundsForNode(
-  node,
-  containerScroll = { scrollTop: 0, scrollLeft: 0 },
-) {
+export default function getBoundsForNode(node, containerScroll = { scrollTop: 0, scrollLeft: 0 }) {
   const { scrollTop, scrollLeft } = containerScroll
   const { documentScrollTop, documentScrollLeft } = getDocumentScroll()
 

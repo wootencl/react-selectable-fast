@@ -26,7 +26,6 @@ const titles = [
   'National Ransom',
 ]
 
-
 export default Array.from({ length: 500 }).map((item, index) => ({
   year: index + 1,
   title: titles[index % titles.length],
