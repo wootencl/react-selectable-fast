@@ -32,7 +32,6 @@ class Counters extends Component {
         Selected: <span className="counter">{selectedItems.length}</span>
         <br />
         <br />
-        <button onClick={this.toggleFirstRow}>Toggle first row</button>
       </p>
     )
   }

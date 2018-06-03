@@ -26,15 +26,22 @@ class App extends Component {
     this.setState({ disableFirstRow: !this.state.disableFirstRow })
   }
 
+  toggleOrder = () => {
+    this.setState({ reversed: !this.state.reversed })
+  }
+
   render() {
     const { items } = this.props
-    const { disableFirstRow } = this.state
+    const { disableFirstRow, reversed } = this.state
 
     const itemsToRender = disableFirstRow ? items.slice(5) : items
+    const orderedItems = reversed ? itemsToRender.slice().reverse() : itemsToRender
 
     return (
       <div>
         <Counters ref={this.countersRef} />
+        <button onClick={this.toggleFirstRow}>Toggle first row</button>
+        <button onClick={this.toggleOrder}>Toggle order</button>
         <SelectableGroup
           ref={ref => (window.selectableGroup = ref)}
           className="main"
@@ -48,7 +55,7 @@ class App extends Component {
           onSelectionFinish={this.handleSelectionFinish}
           ignoreList={['.not-selectable']}
         >
-          <List items={itemsToRender} />
+          <List items={orderedItems} />
         </SelectableGroup>
       </div>
     )
