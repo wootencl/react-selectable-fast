@@ -253,13 +253,18 @@ a:hover {
 
 /* Demo specifics */
 
-.main {
-  padding: 0 10px;
+.wrapper {
   border: 1px solid darkcyan;
-  overflow: hidden;
   height: 80vh;
   overflow: scroll;
   position: relative;
+  margin: 1em;
+}
+
+.main {
+  width: 104em;
+  font-size: 1em;
+  padding: 1em;
 }
 .selectable-selectbox {
   z-index: 9000;
@@ -269,9 +274,7 @@ a:hover {
   border: 1px dashed grey;
 }
 .albums {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  margin: 1em;
 }
 .album-label {
   display: block;
@@ -279,14 +282,15 @@ a:hover {
   font-size: smaller;
 }
 .item {
+  display: inline-block;
   position: relative;
-  width: 145px;
-  min-height: 125px;
-  margin: 2px;
-  float: left;
+  width: 9.6em;
+  height: 9.6em;
+  font-size: 1em;
+  margin: 0.2em;
   text-align: center;
-  border: 1px solid #ccc;
-  padding: 10px;
+  border: 0.1em solid #ccc;
+  padding: 0.2em;
   overflow: hidden;
 }
 .item.not-selectable {
