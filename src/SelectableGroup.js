@@ -25,6 +25,7 @@ class SelectableGroup extends Component {
     resetOnStart: bool,
     disabled: bool,
     delta: number,
+    selectingCursor: string,
     /**
      * Scroll container selector
      */
@@ -661,11 +662,6 @@ class SelectableGroup extends Component {
         this.preventEvent(e.target, 'click')
       }
 
-      // this.selectbox.setState({
-      //   isBoxSelecting: false,
-      //   boxWidth: 0,
-      //   boxHeight: 0,
-      // })
       this.onSelectionFinish()
     }
 
@@ -783,6 +779,7 @@ class SelectableGroup extends Component {
           ref={this.getSelectboxRef}
           fixedPosition={this.props.fixedPosition}
           className={this.props.selectboxClassName}
+          selectingCursor={this.props.selectingCursor}
         />
         {this.props.children}
       </this.props.component>

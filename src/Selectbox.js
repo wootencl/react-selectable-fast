@@ -5,10 +5,12 @@ class Selectbox extends Component {
   static propTypes = {
     fixedPosition: bool,
     className: string,
+    selectingCursor: string,
   }
 
   static defaultProps = {
     className: 'selectable-selectbox',
+    selectingCursor: 'default',
   }
 
   state = {
@@ -31,7 +33,7 @@ class Selectbox extends Component {
       height: this.state.boxHeight,
       zIndex: 9000,
       position: this.props.fixedPosition ? 'fixed' : 'absolute',
-      cursor: 'default',
+      cursor: this.props.selectingCursor,
     }
 
     return (
