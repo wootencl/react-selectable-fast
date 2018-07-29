@@ -140,6 +140,7 @@ class SelectableGroup extends Component {
       )
     }
     if (this.props.contain) {
+      // TODO Figire out if container is in scroll container (should be)
       // Figure out offset between `selectablesContainer` and `scrollContainer` (if any)
       let selectablesContainerOffsetXRelativeToScrollContainer = 0
       let selectablesContainerOffsetYRelativeToScrollContainer = 0
@@ -510,9 +511,10 @@ class SelectableGroup extends Component {
     this.onSelectionFinish()
   }
 
-  onSelectFinish(clickedItem) {
+  onSelectionFinish(clickedItem) {
     if (this.props.returnSelectBoxData) {
       this.props.onSelectionFinish([...this.selectedItems], clickedItem, this.getSelectboxData())
+      return
     }
     this.props.onSelectionFinish([...this.selectedItems], clickedItem)
   }
@@ -520,7 +522,7 @@ class SelectableGroup extends Component {
   getSelectboxData() {
     const {
       boxWidth, boxHeight, boxLeft, boxTop,
-    } = this.selectBox.state
+    } = this.selectbox.state
     const {
       selectablesContainerOffsetXRelativeToScrollContainer,
       selectablesContainerOffsetYRelativeToScrollContainer,
@@ -659,11 +661,11 @@ class SelectableGroup extends Component {
         this.preventEvent(e.target, 'click')
       }
 
-      this.selectbox.setState({
-        isBoxSelecting: false,
-        boxWidth: 0,
-        boxHeight: 0,
-      })
+      // this.selectbox.setState({
+      //   isBoxSelecting: false,
+      //   boxWidth: 0,
+      //   boxHeight: 0,
+      // })
       this.onSelectionFinish()
     }
 
@@ -716,6 +718,11 @@ class SelectableGroup extends Component {
   cleanUp() {
     this.deselectionStarted = false
     this.selectionStarted = false
+    this.selectbox.setState({
+      isBoxSelecting: false,
+      boxWidth: 0,
+      boxHeight: 0,
+    })
     if (this.props.mixedDeselect) {
       for (const item of this.registry.values()) {
         item.deselected = false
