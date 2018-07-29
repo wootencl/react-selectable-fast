@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
-import { bool, string } from 'prop-types'
+import { bool, string, shape } from 'prop-types'
 
 class Selectbox extends Component {
   static propTypes = {
     fixedPosition: bool,
     className: string,
-    selectingCursor: string,
+    selectboxStyles: shape({}),
   }
 
   static defaultProps = {
     className: 'selectable-selectbox',
-    selectingCursor: 'default',
+    selectboxStyles: {},
   }
 
   state = {
@@ -33,7 +33,7 @@ class Selectbox extends Component {
       height: this.state.boxHeight,
       zIndex: 9000,
       position: this.props.fixedPosition ? 'fixed' : 'absolute',
-      cursor: this.props.selectingCursor,
+      ...this.props.selectboxStyles,
     }
 
     return (
