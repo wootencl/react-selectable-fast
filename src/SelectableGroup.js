@@ -68,6 +68,10 @@ class SelectableGroup extends Component {
      * List container selector
      */
     selectablesContainer: string,
+    /**
+     * Boolean indicating whether or not to return select box specific data on `onSelectionFinish`
+     */
+    returnSelectBoxData: bool,
   }
 
   static defaultProps = {
@@ -490,7 +494,7 @@ class SelectableGroup extends Component {
     }
 
     this.setState({ selectionMode: false })
-    this.props.onSelectionFinish([...this.selectedItems])
+    this.onSelectionFinish()
     this.props.onSelectionClear()
   }
 
@@ -503,7 +507,32 @@ class SelectableGroup extends Component {
       }
     }
     this.setState({ selectionMode: true })
-    this.props.onSelectionFinish([...this.selectedItems])
+    this.onSelectionFinish()
+  }
+
+  onSelectFinish(clickedItem) {
+    if (this.props.returnSelectBoxData) {
+      this.props.onSelectionFinish([...this.selectedItems], clickedItem, this.getSelectboxData())
+    }
+    this.props.onSelectionFinish([...this.selectedItems], clickedItem)
+  }
+
+  getSelectboxData() {
+    const {
+      boxWidth, boxHeight, boxLeft, boxTop,
+    } = this.selectBox.state
+    const {
+      selectablesContainerOffsetXRelativeToScrollContainer,
+      selectablesContainerOffsetYRelativeToScrollContainer,
+    } = this.selectablesContainerData
+    return {
+      width: boxWidth,
+      height: boxHeight,
+      left: boxLeft,
+      top: boxTop,
+      relativeLeft: boxLeft - selectablesContainerOffsetXRelativeToScrollContainer,
+      relativeTop: boxTop - selectablesContainerOffsetYRelativeToScrollContainer,
+    }
   }
 
   inIgnoreList(target) {
@@ -635,7 +664,7 @@ class SelectableGroup extends Component {
         boxWidth: 0,
         boxHeight: 0,
       })
-      this.props.onSelectionFinish([...this.selectedItems])
+      this.onSelectionFinish()
     }
 
     this.toggleSelectionMode()
@@ -662,7 +691,7 @@ class SelectableGroup extends Component {
         },
         { click: true }
       )
-      this.props.onSelectionFinish([...this.selectedItems], this.clickedItem)
+      this.onSelectionFinish(this.clickedItem)
 
       if (e.which === 1) {
         this.preventEvent(e.target, 'click')
