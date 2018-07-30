@@ -137,25 +137,10 @@ class SelectableGroup extends Component {
       document.querySelector(this.props.scrollContainer) || this.selectableGroup
     // If `contain` specified and selectable area not equal to scroll area
     if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
-      // TODO Figire out if container is in scroll container (should be)
-      // Figure out offset between `selectableArea` and `scrollContainer` (if any)
-      let selectableAreaOffsetXRelativeToScrollContainer = 0
-      let selectableAreaOffsetYRelativeToScrollContainer = 0
-      let childNode = this.selectableArea
-      let parentNode = null
-      do {
-        // eslint-disable-next-line
-        parentNode = childNode.parentNode
-        const { left: childOffsetLeft, top: childOffsetTop } = childNode.getBoundingClientRect()
-        const { left: parentOffsetLeft, top: parentOffsetTop } = parentNode.getBoundingClientRect()
-        selectableAreaOffsetXRelativeToScrollContainer += childOffsetLeft - parentOffsetLeft
-        selectableAreaOffsetYRelativeToScrollContainer += childOffsetTop - parentOffsetTop
-        childNode = parentNode
-      } while (!this.scrollContainer.isEqualNode(parentNode))
-      this.selectableAreaData = {
-        selectableAreaOffsetXRelativeToScrollContainer,
-        selectableAreaOffsetYRelativeToScrollContainer,
-      }
+      this.selectableAreaData = this.getChildOffsetRelativeToParent(
+        this.selectableArea,
+        this.scrollContainer
+      )
     }
 
     this.selectableArea.addEventListener('mousedown', this.mouseDown)
@@ -164,6 +149,69 @@ class SelectableGroup extends Component {
     if (this.props.deselectOnEsc) {
       document.addEventListener('keydown', this.keyListener)
       document.addEventListener('keyup', this.keyListener)
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    // Need to check if any of the data that is used in `componentDidMount` has changed
+    // and update accordingly
+
+    // `selectableArea`
+    if (this.props.selectableArea !== prevProps.selectableArea) {
+      // Make updates around `selectableArea`
+      this.selectableArea =
+        document.querySelector(this.props.selectableArea) || this.selectableGroup
+      if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
+        this.selectableAreaData = this.getChildOffsetRelativeToParent(
+          this.selectableArea,
+          this.scrollContainer
+        )
+      }
+
+      // Remove old event listeners
+      this.selectableArea.removeEventListener('mousedown', this.mouseDown)
+      this.selectableArea.removeEventListener('touchstart', this.mouseDown)
+      // Add new
+      this.selectableArea.addEventListener('mousedown', this.mouseDown)
+      this.selectableArea.addEventListener('touchstart', this.mouseDown)
+    }
+
+    // `scrollContainer`
+    if (this.props.scrollContainer !== prevProps.scrollContainer) {
+      this.scrollContainer =
+        document.querySelector(this.props.scrollContainer) || this.selectableGroup
+
+      if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
+        this.selectableAreaData = this.getChildOffsetRelativeToParent(
+          this.selectableArea,
+          this.scrollContainer
+        )
+      }
+    }
+
+    // `contain`
+    if (this.props.contain !== prevProps.contain) {
+      if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
+        this.selectableAreaData = this.getChildOffsetRelativeToParent(
+          this.selectableArea,
+          this.scrollContainer
+        )
+      }
+    }
+
+    // `deselectOnEsc`
+    if (this.props.deselectOnEsc !== prevProps.deselectOnEsc) {
+      // Remove old event listeners (if needed)
+      if (prevProps.deselectOnEsc) {
+        document.removeEventListener('keydown', this.keyListener)
+        document.removeEventListener('keyup', this.keyListener)
+      }
+
+      // Add new (if needed)
+      if (this.props.deselectOnEsc) {
+        document.addEventListener('keydown', this.keyListener)
+        document.addEventListener('keyup', this.keyListener)
+      }
     }
   }
 
@@ -759,6 +807,28 @@ class SelectableGroup extends Component {
     return {
       x: mouseEvent.clientX + window.pageXOffset - containerOffsetX,
       y: mouseEvent.clientY + window.pageYOffset - containerOffsetY,
+    }
+  }
+
+  getChildOffsetRelativeToParent(child, parent) {
+    // TODO Figire out if container is in scroll container (should be)
+    // Figure out offset between `selectableArea` and `scrollContainer` (if any)
+    let selectableAreaOffsetXRelativeToScrollContainer = 0
+    let selectableAreaOffsetYRelativeToScrollContainer = 0
+    let childNode = child
+    let parentNode = null
+    do {
+      // eslint-disable-next-line
+      parentNode = childNode.parentNode
+      const { left: childOffsetLeft, top: childOffsetTop } = childNode.getBoundingClientRect()
+      const { left: parentOffsetLeft, top: parentOffsetTop } = parentNode.getBoundingClientRect()
+      selectableAreaOffsetXRelativeToScrollContainer += childOffsetLeft - parentOffsetLeft
+      selectableAreaOffsetYRelativeToScrollContainer += childOffsetTop - parentOffsetTop
+      childNode = parentNode
+    } while (!parent.isEqualNode(parentNode))
+    return {
+      selectableAreaOffsetXRelativeToScrollContainer,
+      selectableAreaOffsetYRelativeToScrollContainer,
     }
   }
 
