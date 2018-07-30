@@ -62,13 +62,13 @@ class SelectableGroup extends Component {
     fixedPosition: bool,
     /**
      * Boolean indicating whether or not the selector should be contained within the
-     * `scrollContainer`. If specified a `selectablesContainer` prop _must_ be supplied.
+     * `scrollContainer`. If specified a `selectableArea` prop _must_ be supplied.
      */
     contain: bool,
     /**
      * List container selector
      */
-    selectablesContainer: string,
+    selectableArea: string,
     /**
      * Boolean indicating whether or not to return select box specific data on `onSelectionFinish`
      */
@@ -92,7 +92,7 @@ class SelectableGroup extends Component {
     deselectOnEsc: true,
     delta: 1,
     contain: false,
-    selectablesContainer: undefined,
+    selectableArea: undefined,
   }
 
   static childContextTypes = {
@@ -107,7 +107,7 @@ class SelectableGroup extends Component {
     this.mouseMoveStarted = false
     this.mouseUpStarted = false
     this.mouseDownData = null
-    this.selectablesContainerData = null
+    this.selectableAreaData = null
 
     this.registry = new Set()
     this.selectedItems = new Set()
@@ -132,38 +132,34 @@ class SelectableGroup extends Component {
   }
 
   componentDidMount() {
-    this.rootNode = this.selectableGroup
-    this.scrollContainer = document.querySelector(this.props.scrollContainer) || this.rootNode
-    this.selectablesContainer = document.querySelector(this.props.selectablesContainer)
-    if (this.props.contain && !this.selectablesContainer) {
-      throw new Error(
-        'Prop "selectablesContainer" must be a valid query selector and exist if "contain" is used!'
-      )
-    }
-    if (this.props.contain) {
+    this.selectableArea = document.querySelector(this.props.selectableArea) || this.selectableGroup
+    this.scrollContainer =
+      document.querySelector(this.props.scrollContainer) || this.selectableGroup
+    // If `contain` specified and selectable area not equal to scroll area
+    if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
       // TODO Figire out if container is in scroll container (should be)
-      // Figure out offset between `selectablesContainer` and `scrollContainer` (if any)
-      let selectablesContainerOffsetXRelativeToScrollContainer = 0
-      let selectablesContainerOffsetYRelativeToScrollContainer = 0
-      let childNode = this.selectablesContainer
+      // Figure out offset between `selectableArea` and `scrollContainer` (if any)
+      let selectableAreaOffsetXRelativeToScrollContainer = 0
+      let selectableAreaOffsetYRelativeToScrollContainer = 0
+      let childNode = this.selectableArea
       let parentNode = null
       do {
         // eslint-disable-next-line
         parentNode = childNode.parentNode
         const { left: childOffsetLeft, top: childOffsetTop } = childNode.getBoundingClientRect()
         const { left: parentOffsetLeft, top: parentOffsetTop } = parentNode.getBoundingClientRect()
-        selectablesContainerOffsetXRelativeToScrollContainer += childOffsetLeft - parentOffsetLeft
-        selectablesContainerOffsetYRelativeToScrollContainer += childOffsetTop - parentOffsetTop
+        selectableAreaOffsetXRelativeToScrollContainer += childOffsetLeft - parentOffsetLeft
+        selectableAreaOffsetYRelativeToScrollContainer += childOffsetTop - parentOffsetTop
         childNode = parentNode
       } while (!this.scrollContainer.isEqualNode(parentNode))
-      this.selectablesContainerData = {
-        selectablesContainerOffsetXRelativeToScrollContainer,
-        selectablesContainerOffsetYRelativeToScrollContainer,
+      this.selectableAreaData = {
+        selectableAreaOffsetXRelativeToScrollContainer,
+        selectableAreaOffsetYRelativeToScrollContainer,
       }
     }
 
-    this.rootNode.addEventListener('mousedown', this.mouseDown)
-    this.rootNode.addEventListener('touchstart', this.mouseDown)
+    this.selectableArea.addEventListener('mousedown', this.mouseDown)
+    this.selectableArea.addEventListener('touchstart', this.mouseDown)
 
     if (this.props.deselectOnEsc) {
       document.addEventListener('keydown', this.keyListener)
@@ -172,8 +168,8 @@ class SelectableGroup extends Component {
   }
 
   componentWillUnmount() {
-    this.rootNode.removeEventListener('mousedown', this.mouseDown)
-    this.rootNode.removeEventListener('touchstart', this.mouseDown)
+    this.selectableArea.removeEventListener('mousedown', this.mouseDown)
+    this.selectableArea.removeEventListener('touchstart', this.mouseDown)
 
     if (this.props.deselectOnEsc) {
       document.removeEventListener('keydown', this.keyListener)
@@ -336,32 +332,32 @@ class SelectableGroup extends Component {
 
     if (this.props.contain) {
       const {
-        selectablesContainerOffsetXRelativeToScrollContainer,
-        selectablesContainerOffsetYRelativeToScrollContainer,
-      } = this.selectablesContainerData
+        selectableAreaOffsetXRelativeToScrollContainer,
+        selectableAreaOffsetYRelativeToScrollContainer,
+      } = this.selectableAreaData
       /**
        * Contain Top
        */
-      if (boxTop >= selectablesContainerOffsetYRelativeToScrollContainer) {
+      if (boxTop >= selectableAreaOffsetYRelativeToScrollContainer) {
         updatedSelectBoxState = { ...updatedSelectBoxState, boxTop }
       } else {
         // Default to maximum bound value
         updatedSelectBoxState = {
           ...updatedSelectBoxState,
-          boxTop: selectablesContainerOffsetYRelativeToScrollContainer,
+          boxTop: selectableAreaOffsetYRelativeToScrollContainer,
           boxHeight: this.mouseDownData.mouseDownRelativeY,
         }
       }
       /**
        * Contain Left
        */
-      if (boxLeft >= selectablesContainerOffsetXRelativeToScrollContainer) {
+      if (boxLeft >= selectableAreaOffsetXRelativeToScrollContainer) {
         updatedSelectBoxState = { ...updatedSelectBoxState, boxLeft }
       } else {
         // Default to minimum contained value (0)
         updatedSelectBoxState = {
           ...updatedSelectBoxState,
-          boxLeft: selectablesContainerOffsetXRelativeToScrollContainer,
+          boxLeft: selectableAreaOffsetXRelativeToScrollContainer,
           boxWidth: this.mouseDownData.mouseDownRelativeX,
         }
       }
@@ -369,29 +365,29 @@ class SelectableGroup extends Component {
       /**
        * Contain Right
        */
-      const selectablesContainerWidth = this.selectablesContainer.scrollWidth
-      const adjustedBoxLeft = boxLeft - selectablesContainerOffsetXRelativeToScrollContainer
-      if (Math.abs(boxWidth) + adjustedBoxLeft < selectablesContainerWidth && adjustedBoxLeft > 0) {
+      const selectableAreaWidth = this.selectableArea.scrollWidth
+      const adjustedBoxLeft = boxLeft - selectableAreaOffsetXRelativeToScrollContainer
+      if (Math.abs(boxWidth) + adjustedBoxLeft < selectableAreaWidth && adjustedBoxLeft > 0) {
         updatedSelectBoxState = { ...updatedSelectBoxState, boxWidth: Math.abs(boxWidth) }
       } else if (adjustedBoxLeft > 0) {
         // Default to maximum contained value
         updatedSelectBoxState = {
           ...updatedSelectBoxState,
-          boxWidth: selectablesContainerWidth - adjustedBoxLeft,
+          boxWidth: selectableAreaWidth - adjustedBoxLeft,
         }
       }
       /**
        * Contain Bottom
        */
-      const selectablesContainerHeight = this.selectablesContainer.scrollHeight
-      const adjustedBoxTop = boxTop - selectablesContainerOffsetYRelativeToScrollContainer
-      if (Math.abs(boxHeight) + adjustedBoxTop < selectablesContainerHeight && adjustedBoxTop > 0) {
+      const selectableAreaHeight = this.selectableArea.scrollHeight
+      const adjustedBoxTop = boxTop - selectableAreaOffsetYRelativeToScrollContainer
+      if (Math.abs(boxHeight) + adjustedBoxTop < selectableAreaHeight && adjustedBoxTop > 0) {
         updatedSelectBoxState = { ...updatedSelectBoxState, boxHeight: Math.abs(boxHeight) }
       } else if (adjustedBoxTop > 0) {
         // Default to maximum contained value
         updatedSelectBoxState = {
           ...updatedSelectBoxState,
-          boxHeight: selectablesContainerHeight - adjustedBoxTop,
+          boxHeight: selectableAreaHeight - adjustedBoxTop,
         }
       }
     } else {
@@ -524,18 +520,24 @@ class SelectableGroup extends Component {
     const {
       boxWidth, boxHeight, boxLeft, boxTop,
     } = this.selectbox.state
-    const {
-      selectablesContainerOffsetXRelativeToScrollContainer,
-      selectablesContainerOffsetYRelativeToScrollContainer,
-    } = this.selectablesContainerData
-    return {
+    const data = {
       width: boxWidth,
       height: boxHeight,
       left: boxLeft,
       top: boxTop,
-      relativeLeft: boxLeft - selectablesContainerOffsetXRelativeToScrollContainer,
-      relativeTop: boxTop - selectablesContainerOffsetYRelativeToScrollContainer,
     }
+    if (this.props.contain) {
+      const {
+        selectableAreaOffsetXRelativeToScrollContainer,
+        selectableAreaOffsetYRelativeToScrollContainer,
+      } = this.selectableAreaData
+      return {
+        ...data,
+        relativeLeft: boxLeft - selectableAreaOffsetXRelativeToScrollContainer,
+        relativeTop: boxTop - selectableAreaOffsetYRelativeToScrollContainer,
+      }
+    }
+    return data
   }
 
   inIgnoreList(target) {
@@ -572,12 +574,10 @@ class SelectableGroup extends Component {
     e = this.desktopEventCoords(e)
 
     if (
-      (!this.props.globalMouse && !isNodeInRoot(e.target, this.selectableGroup)) ||
+      (!this.props.globalMouse && !isNodeInRoot(e.target, this.selectableArea)) ||
       this.props.contain
     ) {
-      const offsetData = getBoundsForNode(
-        this.props.contain ? this.selectablesContainer : this.selectableGroup
-      )
+      const offsetData = getBoundsForNode(this.selectableArea)
       const collides = doObjectsCollide(
         {
           top: offsetData.top,
@@ -649,7 +649,7 @@ class SelectableGroup extends Component {
     const eventTop = e.pageY
     const eventLeft = e.pageX
 
-    if (!this.mouseMoved && isNodeInRoot(e.target, this.rootNode)) {
+    if (!this.mouseMoved && isNodeInRoot(e.target, this.selectableArea)) {
       this.handleClick(e, eventTop, eventLeft)
     } else {
       for (const item of this.selectingItems.values()) {
@@ -753,10 +753,7 @@ class SelectableGroup extends Component {
     const { left: htmlLeft, top: htmlTop } = document
       .getElementsByTagName('html')[0]
       .getBoundingClientRect()
-    const {
-      left: containerLeft,
-      top: containerTop,
-    } = this.selectablesContainer.getBoundingClientRect()
+    const { left: containerLeft, top: containerTop } = this.selectableArea.getBoundingClientRect()
     const containerOffsetX = containerLeft - htmlLeft
     const containerOffsetY = containerTop - htmlTop
     return {

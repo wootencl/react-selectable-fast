@@ -45,21 +45,19 @@ class App extends Component {
         <div className="wrapper">
           <SelectableGroup
             contain
-            className="main"
-            selectablesContainer=".albums"
+            selectableArea=".albums"
             scrollContainer=".wrapper"
-            returnSelectBoxData
+            ref={ref => (window.selectableGroup = ref)}
+            className="main"
+            clickClassName="tick"
+            enableDeselect
+            tolerance={0}
+            deselectOnEsc={false}
+            allowClickWithoutSelected={false}
+            duringSelection={this.handleSelecting}
+            onSelectionClear={this.handleSelectionClear}
             onSelectionFinish={this.handleSelectionFinish}
-
-            // ref={ref => (window.selectableGroup = ref)}
-            // clickClassName="tick"
-            // enableDeselect
-            // tolerance={0}
-            // deselectOnEsc={false}
-            // allowClickWithoutSelected={false}
-            // duringSelection={this.handleSelecting}
-            // onSelectionClear={this.handleSelectionClear}
-            // ignoreList={['.not-selectable']}
+            ignoreList={['.not-selectable']}
           >
             <List items={orderedItems} />
           </SelectableGroup>
