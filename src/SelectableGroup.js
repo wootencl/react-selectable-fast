@@ -137,10 +137,7 @@ class SelectableGroup extends Component {
       document.querySelector(this.props.scrollContainer) || this.selectableGroup
     // If `contain` specified and selectable area not equal to scroll area
     if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
-      this.selectableAreaData = this.getChildOffsetRelativeToParent(
-        this.selectableArea,
-        this.scrollContainer
-      )
+      this.selectableAreaData = this.getSelectAreaOffsetRelativeToScrollContainer()
     }
 
     this.selectableArea.addEventListener('mousedown', this.mouseDown)
@@ -162,10 +159,7 @@ class SelectableGroup extends Component {
       this.selectableArea =
         document.querySelector(this.props.selectableArea) || this.selectableGroup
       if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
-        this.selectableAreaData = this.getChildOffsetRelativeToParent(
-          this.selectableArea,
-          this.scrollContainer
-        )
+        this.selectableAreaData = this.getSelectAreaOffsetRelativeToScrollContainer()
       }
 
       // Remove old event listeners
@@ -182,20 +176,14 @@ class SelectableGroup extends Component {
         document.querySelector(this.props.scrollContainer) || this.selectableGroup
 
       if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
-        this.selectableAreaData = this.getChildOffsetRelativeToParent(
-          this.selectableArea,
-          this.scrollContainer
-        )
+        this.selectableAreaData = this.getSelectAreaOffsetRelativeToScrollContainer()
       }
     }
 
     // `contain`
     if (this.props.contain !== prevProps.contain) {
       if (this.props.contain && !this.selectableArea.isEqualNode(this.scrollContainer)) {
-        this.selectableAreaData = this.getChildOffsetRelativeToParent(
-          this.selectableArea,
-          this.scrollContainer
-        )
+        this.selectableAreaData = this.getSelectAreaOffsetRelativeToScrollContainer()
       }
     }
 
@@ -266,7 +254,7 @@ class SelectableGroup extends Component {
     if (offset > 0 || e.clientY > window.innerHeight) {
       const newTop = currentTop + Math.max(offset, minimumSpeedFactor) * scrollSpeed
 
-      this.scrollContainer.scrollTop = Math.min(newTop, this.maxScroll)
+      this.scrollContainer.scrollTop = Math.min(newTop, this.maxScrollHeight)
     }
   }
 
@@ -294,13 +282,14 @@ class SelectableGroup extends Component {
     if (offset > 0 || e.clientX > window.innerWidth) {
       const newLeft = currentLeft + Math.max(offset, minimumSpeedFactor) * scrollSpeed
 
-      this.scrollContainer.scrollLeft = Math.min(newLeft, this.maxScroll)
+      this.scrollContainer.scrollLeft = Math.min(newLeft, this.maxScrollWidth)
     }
   }
 
   updateRootBounds() {
     this.scrollBounds = this.scrollContainer.getBoundingClientRect()
-    this.maxScroll = this.scrollContainer.scrollHeight - this.scrollContainer.clientHeight
+    this.maxScrollHeight = this.scrollContainer.scrollHeight - this.scrollContainer.clientHeight
+    this.maxScrollWidth = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth
   }
 
   updateRegistry = () => {
@@ -815,13 +804,13 @@ class SelectableGroup extends Component {
     }
   }
 
-  getChildOffsetRelativeToParent(child, parent) {
+  getSelectAreaOffsetRelativeToScrollContainer() {
     // TODO Figire out if container is in scroll container (should be)
-    const { left: parentLeft, top: parentTop } = parent.getBoundingClientRect()
-    const { left: childLeft, top: childTop } = child.getBoundingClientRect()
+    const { left: parentLeft, top: parentTop } = this.scrollContainer.getBoundingClientRect()
+    const { left: childLeft, top: childTop } = this.selectableArea.getBoundingClientRect()
     return {
-      offsetX: childLeft - parentLeft,
-      offsetY: childTop - parentTop,
+      offsetX: childLeft - parentLeft + this.scrollContainer.scrollLeft,
+      offsetY: childTop - parentTop + this.scrollContainer.scrollTop,
     }
   }
 
