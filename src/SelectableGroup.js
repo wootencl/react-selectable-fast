@@ -569,14 +569,11 @@ class SelectableGroup extends Component {
       top: boxTop,
     }
     if (this.props.contain) {
-      const {
-        selectableAreaOffsetXRelativeToScrollContainer,
-        selectableAreaOffsetYRelativeToScrollContainer,
-      } = this.selectableAreaData
+      const { offsetX, offsetY } = this.selectableAreaData
       return {
         ...data,
-        relativeLeft: boxLeft - selectableAreaOffsetXRelativeToScrollContainer,
-        relativeTop: boxTop - selectableAreaOffsetYRelativeToScrollContainer,
+        relativeLeft: boxLeft - offsetX,
+        relativeTop: boxTop - offsetY,
       }
     }
     return data
