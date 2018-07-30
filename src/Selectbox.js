@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { bool, string, shape } from 'prop-types'
+import { bool, string, object } from 'prop-types'
 
 class Selectbox extends Component {
   static propTypes = {
     fixedPosition: bool,
     className: string,
-    selectboxStyles: shape({}),
+    selectboxStyles: object,
   }
 
   static defaultProps = {

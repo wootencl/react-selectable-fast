@@ -25,7 +25,7 @@ class SelectableGroup extends Component {
     resetOnStart: bool,
     disabled: bool,
     delta: number,
-    selectboxStyles: string,
+    selectboxStyles: object,
     /**
      * Scroll container selector
      */
